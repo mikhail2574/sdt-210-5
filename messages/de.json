@@ -1,0 +1,126 @@
+{
+  "home": {
+    "title": "Kundenportal Demo",
+    "description": "Öffne die Wizard-Seite antragsdetails mit Theme, i18n und Autosave.",
+    "demoLink": "Demo-Formular öffnen",
+    "softLink": "Soft-required Variante öffnen"
+  },
+  "theme": {
+    "logoAlt": "Stadtwerke Kundenportal"
+  },
+  "language": {
+    "label": "Sprache",
+    "de": "DE",
+    "en": "EN",
+    "tr": "TR",
+    "es": "ES"
+  },
+  "forms": {
+    "hausanschluss": {
+      "title": "Hausanschluss",
+      "description": "Bitte gib die wichtigsten Antragsdetails an."
+    }
+  },
+  "pages": {
+    "antragsdetails": {
+      "title": "Antragsdetails",
+      "info": "Wähle Medium, Art des Antrags und den gewünschten Termin. Pflichtfelder blockieren den nächsten Schritt."
+    }
+  },
+  "sections": {
+    "medium": {
+      "title": "Medium"
+    },
+    "antragsart": {
+      "title": "Antragsart"
+    },
+    "planung": {
+      "title": "Planung"
+    }
+  },
+  "fields": {
+    "selectedMedia": {
+      "label": "Ausgewählte Medien"
+    },
+    "requestType": {
+      "label": "Art des Antrags"
+    },
+    "changeKind": {
+      "label": "Art der Veränderung",
+      "help": "Dieses Feld wird sichtbar, wenn du „Änderung“ wählst."
+    },
+    "wunschtermin": {
+      "label": "Wunschtermin",
+      "help": "Bitte wähle ein Datum im Format TT.MM.JJJJ."
+    },
+    "message": {
+      "label": "Nachricht",
+      "help": "Optional, maximal 255 Zeichen.",
+      "helpWithHint": "Optional, maximal 255 Zeichen. Tenant-Override kann Hilfe oder Verhalten anpassen."
+    }
+  },
+  "media": {
+    "strom": "Strom",
+    "gas": "Gas",
+    "wasser": "Wasser"
+  },
+  "requestType": {
+    "new": "Neuer Anschluss",
+    "change": "Änderung",
+    "stilllegung": "Stilllegung"
+  },
+  "changeKind": {
+    "erweiterung": "Anlagenerweiterung",
+    "zusammenlegung": "Zusammenlegung"
+  },
+  "wizard": {
+    "headerTitle": "White-Label Kundenportal",
+    "next": "Weiter",
+    "nextStepHint": "Anschlussort",
+    "selectPlaceholder": "Bitte auswählen",
+    "requiredBadge": "Pflicht",
+    "softRequiredBadge": "Später möglich",
+    "errorSummaryTitle": "Bitte korrigiere die markierten Felder.",
+    "errorSummaryDescription": "Die Seite enthält Validierungsfehler.",
+    "softRequired": {
+      "title": "Fehlende optionale Pflichtangaben",
+      "description": "Diese Angaben können übersprungen werden, blockieren aber später die Bearbeitung.",
+      "leaveWarning": "Soft-required Felder können übersprungen werden.",
+      "fillNow": "Jetzt ausfüllen",
+      "skip": "Überspringen"
+    },
+    "saving": "Speichern…",
+    "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+    "saved": "Entwurf gespeichert."
+  },
+  "errors": {
+    "selectedMedia": {
+      "required": "Wähle mindestens ein Medium aus."
+    },
+    "requestType": {
+      "required": "Wähle eine Antragsart aus."
+    },
+    "changeKind": {
+      "required": "Wähle die Art der Veränderung aus."
+    },
+    "wunschtermin": {
+      "required": "Wähle einen Wunschtermin aus.",
+      "invalid": "Gib ein gültiges Datum an."
+    },
+    "message": {
+      "maxLength": "Die Nachricht darf maximal 255 Zeichen lang sein."
+    }
+  },
+  "links": {
+    "privacy": "Datenschutzerklärung",
+    "imprint": "Impressum",
+    "accessibility": "Barrierefreiheit"
+  },
+  "placeholder": {
+    "anschlussort": {
+      "title": "Nächster Schritt: Anschlussort",
+      "description": "Autosave war erfolgreich. Diese Demo fokussiert nur die Seite antragsdetails.",
+      "backLink": "Zurück zu Antragsdetails"
+    }
+  }
+}

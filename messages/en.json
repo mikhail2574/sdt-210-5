@@ -1,0 +1,126 @@
+{
+  "home": {
+    "title": "Kundenportal demo",
+    "description": "Open the antragsdetails wizard page with theme, i18n and autosave.",
+    "demoLink": "Open demo form",
+    "softLink": "Open soft-required variant"
+  },
+  "theme": {
+    "logoAlt": "Stadtwerke customer portal"
+  },
+  "language": {
+    "label": "Language",
+    "de": "DE",
+    "en": "EN",
+    "tr": "TR",
+    "es": "ES"
+  },
+  "forms": {
+    "hausanschluss": {
+      "title": "House connection",
+      "description": "Please provide the key application details."
+    }
+  },
+  "pages": {
+    "antragsdetails": {
+      "title": "Application details",
+      "info": "Choose media, request type and your preferred date. Required fields block the next step."
+    }
+  },
+  "sections": {
+    "medium": {
+      "title": "Media"
+    },
+    "antragsart": {
+      "title": "Request type"
+    },
+    "planung": {
+      "title": "Planning"
+    }
+  },
+  "fields": {
+    "selectedMedia": {
+      "label": "Selected media"
+    },
+    "requestType": {
+      "label": "Request type"
+    },
+    "changeKind": {
+      "label": "Change type",
+      "help": "This field becomes visible when you choose “Change connection”."
+    },
+    "wunschtermin": {
+      "label": "Preferred appointment",
+      "help": "Please choose a date."
+    },
+    "message": {
+      "label": "Message",
+      "help": "Optional, maximum 255 characters.",
+      "helpWithHint": "Optional, maximum 255 characters. Tenant overrides may change the hint or behavior."
+    }
+  },
+  "media": {
+    "strom": "Electricity",
+    "gas": "Gas",
+    "wasser": "Water"
+  },
+  "requestType": {
+    "new": "New connection",
+    "change": "Change connection",
+    "stilllegung": "Decommissioning"
+  },
+  "changeKind": {
+    "erweiterung": "System expansion",
+    "zusammenlegung": "Merge"
+  },
+  "wizard": {
+    "headerTitle": "White-label customer portal",
+    "next": "Next",
+    "nextStepHint": "Connection location",
+    "selectPlaceholder": "Please select",
+    "requiredBadge": "Required",
+    "softRequiredBadge": "Can be skipped",
+    "errorSummaryTitle": "Please fix the highlighted fields.",
+    "errorSummaryDescription": "The page contains validation errors.",
+    "softRequired": {
+      "title": "Missing soft-required information",
+      "description": "You can skip these fields now, but processing stays blocked until they are completed.",
+      "leaveWarning": "Soft-required fields may be skipped.",
+      "fillNow": "Fill now",
+      "skip": "Skip for now"
+    },
+    "saving": "Saving…",
+    "saveError": "Saving failed. Please try again.",
+    "saved": "Draft saved."
+  },
+  "errors": {
+    "selectedMedia": {
+      "required": "Select at least one medium."
+    },
+    "requestType": {
+      "required": "Select a request type."
+    },
+    "changeKind": {
+      "required": "Select the change type."
+    },
+    "wunschtermin": {
+      "required": "Select a preferred appointment.",
+      "invalid": "Enter a valid date."
+    },
+    "message": {
+      "maxLength": "The message must not exceed 255 characters."
+    }
+  },
+  "links": {
+    "privacy": "Privacy policy",
+    "imprint": "Imprint",
+    "accessibility": "Accessibility"
+  },
+  "placeholder": {
+    "anschlussort": {
+      "title": "Next step: connection location",
+      "description": "Autosave succeeded. This demo focuses only on the antragsdetails page.",
+      "backLink": "Back to application details"
+    }
+  }
+}

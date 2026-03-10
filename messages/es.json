@@ -1,0 +1,126 @@
+{
+  "home": {
+    "title": "Demo de Kundenportal",
+    "description": "Abre la página del asistente antragsdetails con tema, i18n y guardado automático.",
+    "demoLink": "Abrir formulario demo",
+    "softLink": "Abrir variante soft-required"
+  },
+  "theme": {
+    "logoAlt": "Portal de clientes Stadtwerke"
+  },
+  "language": {
+    "label": "Idioma",
+    "de": "DE",
+    "en": "EN",
+    "tr": "TR",
+    "es": "ES"
+  },
+  "forms": {
+    "hausanschluss": {
+      "title": "Conexión doméstica",
+      "description": "Introduce los datos principales de la solicitud."
+    }
+  },
+  "pages": {
+    "antragsdetails": {
+      "title": "Detalles de la solicitud",
+      "info": "Elige los medios, el tipo de solicitud y la fecha deseada. Los campos obligatorios bloquean el siguiente paso."
+    }
+  },
+  "sections": {
+    "medium": {
+      "title": "Medios"
+    },
+    "antragsart": {
+      "title": "Tipo de solicitud"
+    },
+    "planung": {
+      "title": "Planificación"
+    }
+  },
+  "fields": {
+    "selectedMedia": {
+      "label": "Medios seleccionados"
+    },
+    "requestType": {
+      "label": "Tipo de solicitud"
+    },
+    "changeKind": {
+      "label": "Tipo de cambio",
+      "help": "Este campo aparece cuando eliges “Cambio de conexión”."
+    },
+    "wunschtermin": {
+      "label": "Fecha preferida",
+      "help": "Selecciona una fecha."
+    },
+    "message": {
+      "label": "Mensaje",
+      "help": "Opcional, máximo 255 caracteres.",
+      "helpWithHint": "Opcional, máximo 255 caracteres. El override del tenant puede cambiar la ayuda o el comportamiento."
+    }
+  },
+  "media": {
+    "strom": "Electricidad",
+    "gas": "Gas",
+    "wasser": "Agua"
+  },
+  "requestType": {
+    "new": "Nueva conexión",
+    "change": "Cambio de conexión",
+    "stilllegung": "Desconexión"
+  },
+  "changeKind": {
+    "erweiterung": "Ampliación",
+    "zusammenlegung": "Unificación"
+  },
+  "wizard": {
+    "headerTitle": "Portal de clientes white-label",
+    "next": "Continuar",
+    "nextStepHint": "Ubicación de conexión",
+    "selectPlaceholder": "Selecciona una opción",
+    "requiredBadge": "Obligatorio",
+    "softRequiredBadge": "Se puede omitir",
+    "errorSummaryTitle": "Corrige los campos resaltados.",
+    "errorSummaryDescription": "La página contiene errores de validación.",
+    "softRequired": {
+      "title": "Información soft-required pendiente",
+      "description": "Puedes omitir estos campos ahora, pero el procesamiento seguirá bloqueado hasta completarlos.",
+      "leaveWarning": "Los campos soft-required se pueden omitir.",
+      "fillNow": "Completar ahora",
+      "skip": "Omitir por ahora"
+    },
+    "saving": "Guardando…",
+    "saveError": "No se pudo guardar. Inténtalo de nuevo.",
+    "saved": "Borrador guardado."
+  },
+  "errors": {
+    "selectedMedia": {
+      "required": "Selecciona al menos un medio."
+    },
+    "requestType": {
+      "required": "Selecciona un tipo de solicitud."
+    },
+    "changeKind": {
+      "required": "Selecciona el tipo de cambio."
+    },
+    "wunschtermin": {
+      "required": "Selecciona una fecha preferida.",
+      "invalid": "Introduce una fecha válida."
+    },
+    "message": {
+      "maxLength": "El mensaje no puede superar los 255 caracteres."
+    }
+  },
+  "links": {
+    "privacy": "Política de privacidad",
+    "imprint": "Aviso legal",
+    "accessibility": "Accesibilidad"
+  },
+  "placeholder": {
+    "anschlussort": {
+      "title": "Siguiente paso: ubicación de conexión",
+      "description": "El guardado automático fue correcto. Esta demo se centra solo en la página antragsdetails.",
+      "backLink": "Volver a detalles de la solicitud"
+    }
+  }
+}

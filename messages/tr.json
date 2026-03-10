@@ -1,0 +1,126 @@
+{
+  "home": {
+    "title": "Kundenportal demosu",
+    "description": "Tema, i18n ve otomatik kaydetme ile antragsdetails sihirbaz sayfasını açın.",
+    "demoLink": "Demo formunu aç",
+    "softLink": "Soft-required varyantını aç"
+  },
+  "theme": {
+    "logoAlt": "Stadtwerke müşteri portalı"
+  },
+  "language": {
+    "label": "Dil",
+    "de": "DE",
+    "en": "EN",
+    "tr": "TR",
+    "es": "ES"
+  },
+  "forms": {
+    "hausanschluss": {
+      "title": "Ev bağlantısı",
+      "description": "Lütfen temel başvuru bilgilerini girin."
+    }
+  },
+  "pages": {
+    "antragsdetails": {
+      "title": "Başvuru detayları",
+      "info": "Medya türünü, başvuru tipini ve tercih edilen tarihi seçin. Zorunlu alanlar sonraki adıma geçişi engeller."
+    }
+  },
+  "sections": {
+    "medium": {
+      "title": "Medya"
+    },
+    "antragsart": {
+      "title": "Başvuru tipi"
+    },
+    "planung": {
+      "title": "Planlama"
+    }
+  },
+  "fields": {
+    "selectedMedia": {
+      "label": "Seçilen medya"
+    },
+    "requestType": {
+      "label": "Başvuru tipi"
+    },
+    "changeKind": {
+      "label": "Değişiklik türü",
+      "help": "Bu alan yalnızca “Bağlantı değişikliği” seçildiğinde görünür."
+    },
+    "wunschtermin": {
+      "label": "Tercih edilen tarih",
+      "help": "Lütfen bir tarih seçin."
+    },
+    "message": {
+      "label": "Mesaj",
+      "help": "İsteğe bağlı, en fazla 255 karakter.",
+      "helpWithHint": "İsteğe bağlı, en fazla 255 karakter. Tenant override davranışı değiştirebilir."
+    }
+  },
+  "media": {
+    "strom": "Elektrik",
+    "gas": "Gaz",
+    "wasser": "Su"
+  },
+  "requestType": {
+    "new": "Yeni bağlantı",
+    "change": "Bağlantı değişikliği",
+    "stilllegung": "Devreden çıkarma"
+  },
+  "changeKind": {
+    "erweiterung": "Tesis genişletmesi",
+    "zusammenlegung": "Birleştirme"
+  },
+  "wizard": {
+    "headerTitle": "White-label müşteri portalı",
+    "next": "Devam et",
+    "nextStepHint": "Bağlantı konumu",
+    "selectPlaceholder": "Lütfen seçin",
+    "requiredBadge": "Zorunlu",
+    "softRequiredBadge": "Sonra doldurulabilir",
+    "errorSummaryTitle": "Lütfen işaretli alanları düzeltin.",
+    "errorSummaryDescription": "Sayfada doğrulama hataları var.",
+    "softRequired": {
+      "title": "Eksik soft-required bilgiler",
+      "description": "Bu alanları şimdi atlayabilirsiniz, ancak tamamlanmadan işlem başlatılamaz.",
+      "leaveWarning": "Soft-required alanlar atlanabilir.",
+      "fillNow": "Şimdi doldur",
+      "skip": "Şimdilik atla"
+    },
+    "saving": "Kaydediliyor…",
+    "saveError": "Kaydetme başarısız oldu. Lütfen tekrar deneyin.",
+    "saved": "Taslak kaydedildi."
+  },
+  "errors": {
+    "selectedMedia": {
+      "required": "En az bir medya seçin."
+    },
+    "requestType": {
+      "required": "Bir başvuru tipi seçin."
+    },
+    "changeKind": {
+      "required": "Değişiklik türünü seçin."
+    },
+    "wunschtermin": {
+      "required": "Tercih edilen tarihi seçin.",
+      "invalid": "Geçerli bir tarih girin."
+    },
+    "message": {
+      "maxLength": "Mesaj en fazla 255 karakter olabilir."
+    }
+  },
+  "links": {
+    "privacy": "Gizlilik bildirimi",
+    "imprint": "Künye",
+    "accessibility": "Erişilebilirlik"
+  },
+  "placeholder": {
+    "anschlussort": {
+      "title": "Sonraki adım: bağlantı konumu",
+      "description": "Otomatik kaydetme başarılı oldu. Bu demo yalnızca antragsdetails sayfasına odaklanır.",
+      "backLink": "Başvuru detaylarına geri dön"
+    }
+  }
+}

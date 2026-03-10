@@ -1,0 +1,7 @@
+<svg width="180" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="48" rx="10" fill="#0057B8"/>
+  <path d="M20 13H30.5C36.299 13 41 17.701 41 23.5C41 29.299 36.299 34 30.5 34H20V13Z" fill="#F6A313"/>
+  <path d="M33 13H43.5C49.299 13 54 17.701 54 23.5C54 29.299 49.299 34 43.5 34H33V13Z" fill="white" fill-opacity="0.88"/>
+  <text x="68" y="21" fill="white" font-family="Arial, sans-serif" font-size="13" font-weight="700">Stadtwerke</text>
+  <text x="68" y="33" fill="white" font-family="Arial, sans-serif" font-size="12">Kundenportal</text>
+</svg>
