@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import deMessages from "../../messages/de.json";
 import { AntragsdetailsWizard } from "@/components/kundenportal/AntragsdetailsWizard";
 import { getPageSchema, getFormRuntime } from "@/lib/forms/runtime";
+import { useAppStore } from "@/lib/state/app-store";
 
 const pushMock = vi.fn();
 
@@ -122,6 +123,51 @@ describe("AntragsdetailsWizard", () => {
     });
 
     expect(onNavigate).toHaveBeenCalledWith("/de/forms/hausanschluss-soft-demo/anschlussort?applicationId=app-123");
+  });
+
+  it("restores persisted wizard state and continues autosave with the stored application id", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        applicationId: "app-existing",
+        nextPageKey: "anschlussort"
+      })
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    useAppStore.getState().setFormApplicationId("hausanschluss-demo", "app-existing");
+    useAppStore.getState().saveFormPageDraft("hausanschluss-demo", "antragsdetails", {
+      selectedMedia: ["gas"],
+      requestType: "change_connection",
+      changeKind: "anlagen_erweiterung",
+      wunschtermin: "2026-03-20",
+      message: "Bitte rueckrufen"
+    });
+
+    const onNavigate = vi.fn();
+    renderWizard("hausanschluss-demo", onNavigate);
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Gas")).toBeChecked();
+      expect(screen.getByLabelText("Änderung")).toBeChecked();
+      expect(screen.getByRole("combobox", { name: /Art der Veränderung/ })).toHaveValue("anlagen_erweiterung");
+      expect(screen.getByLabelText(/Wunschtermin/)).toHaveValue("2026-03-20");
+      expect(screen.getByLabelText("Nachricht")).toHaveValue("Bitte rueckrufen");
+    });
+
+    await user.click(screen.getByRole("button", { name: "Weiter" }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/public/applications/app-existing/pages/antragsdetails",
+        expect.objectContaining({
+          method: "PUT"
+        })
+      );
+    });
+
+    expect(onNavigate).toHaveBeenCalledWith("/de/forms/hausanschluss-demo/anschlussort?applicationId=app-existing");
   });
 
   it("has no obvious accessibility violations for the initial page state", async () => {
