@@ -5,10 +5,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "api:dev": "tsx watch apps/api/src/main.ts",
+    "api:compile": "tsc -p apps/api/tsconfig.runtime.json",
+    "api:dev": "pnpm run api:migrate:run && node .api-dist/api/src/main.js",
     "api:build": "tsc -p apps/api/tsconfig.json --noEmit",
     "api:test": "vitest run --config apps/api/vitest.config.ts",
-    "api:migrate:run": "tsx apps/api/scripts/run-migrations.ts",
+    "api:migrate:run": "pnpm run api:compile && node .api-dist/api/scripts/run-migrations.js",
     "test": "pnpm run test:unit && pnpm run test:e2e",
     "test:unit": "vitest run",
     "test:e2e": "playwright test"

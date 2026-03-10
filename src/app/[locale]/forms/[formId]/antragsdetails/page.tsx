@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { AntragsdetailsWizard } from "@/components/kundenportal/AntragsdetailsWizard";
+import { getBackendFormRuntime } from "@/lib/backend/public-api";
+import { resolveLocalRuntimeFormId } from "@/lib/forms/demo-catalog";
 import { getDraft } from "@/lib/forms/store";
 import { getPageSchema, getFormRuntime } from "@/lib/forms/runtime";
 import { isLocale, type Locale } from "@/lib/i18n";
@@ -23,8 +25,15 @@ export default async function AntragsdetailsRoute({ params, searchParams }: Antr
     notFound();
   }
 
-  const runtime = getFormRuntime(formId);
-  const page = getPageSchema(formId, "antragsdetails");
+  let runtime = null;
+
+  try {
+    runtime = await getBackendFormRuntime(formId);
+  } catch {
+    runtime = getFormRuntime(resolveLocalRuntimeFormId(formId));
+  }
+
+  const page = runtime.schema.form.pages.find((pageItem) => pageItem.key === "antragsdetails") ?? getPageSchema(formId, "antragsdetails");
 
   if (!page) {
     notFound();

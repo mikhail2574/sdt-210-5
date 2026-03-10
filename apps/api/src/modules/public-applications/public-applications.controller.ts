@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Param, ParseUUIDPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post, Put } from "@nestjs/common";
 
 import { CreateDraftDto } from "./dto/create-draft.dto";
 import { UpdatePageDto } from "./dto/update-page.dto";
@@ -10,6 +10,11 @@ export class PublicApplicationsController {
     @Inject(PublicApplicationsService)
     private readonly publicApplicationsService: PublicApplicationsService
   ) {}
+
+  @Get("forms/:formId")
+  getRuntime(@Param("formId", new ParseUUIDPipe()) formId: string) {
+    return this.publicApplicationsService.getFormRuntime(formId);
+  }
 
   @Post("forms/:formId/applications:draft")
   createDraft(@Param("formId", new ParseUUIDPipe()) formId: string, @Body() body: CreateDraftDto) {

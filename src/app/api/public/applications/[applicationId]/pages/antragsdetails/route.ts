@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { proxyPublicApiRequest } from "@/lib/backend/public-api";
 import { getDraft, updateDraft } from "@/lib/forms/store";
 import { getPageSchema } from "@/lib/forms/runtime";
 import { getSoftMissingFields, validateRequiredFields } from "@/lib/forms/validation";
@@ -15,6 +16,18 @@ export async function PUT(request: Request, { params }: UpdateRouteProps) {
   const body = (await request.json()) as {
     data: Record<string, unknown>;
   };
+
+  try {
+    const response = await proxyPublicApiRequest(`/applications/${applicationId}/pages/antragsdetails`, {
+      method: "PUT",
+      body: JSON.stringify(body)
+    });
+
+    if (response.ok || response.status === 422 || response.status === 403) {
+      return NextResponse.json(response.payload, { status: response.status });
+    }
+  } catch {}
+
   const currentDraft = getDraft(applicationId);
 
   if (!currentDraft) {

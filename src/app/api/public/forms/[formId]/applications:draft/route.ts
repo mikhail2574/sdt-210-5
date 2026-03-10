@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { proxyPublicApiRequest } from "@/lib/backend/public-api";
+import { resolveBackendFormId, resolveLocalRuntimeFormId } from "@/lib/forms/demo-catalog";
 import { createDraft } from "@/lib/forms/store";
 import { getPageSchema } from "@/lib/forms/runtime";
 import { getSoftMissingFields, normalizeValues, validateRequiredFields } from "@/lib/forms/validation";
@@ -16,7 +18,19 @@ export async function POST(request: Request, { params }: DraftRouteProps) {
     pageKey: string;
     data: Record<string, unknown>;
   };
-  const page = getPageSchema(formId, body.pageKey);
+
+  try {
+    const response = await proxyPublicApiRequest(`/forms/${resolveBackendFormId(formId)}/applications:draft`, {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
+
+    if (response.ok || response.status === 422 || response.status === 403) {
+      return NextResponse.json(response.payload, { status: response.status });
+    }
+  } catch {}
+
+  const page = getPageSchema(resolveLocalRuntimeFormId(formId), body.pageKey);
 
   if (!page) {
     return NextResponse.json({ error: "page_not_found" }, { status: 404 });

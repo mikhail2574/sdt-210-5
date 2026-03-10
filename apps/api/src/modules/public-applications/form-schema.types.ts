@@ -31,12 +31,16 @@ export type FieldBlock = {
   };
   requirement: Requirement;
   labelI18nKey?: string;
+  helpTextI18nKey?: string;
   options?: FieldOption[];
   visibleWhen?: ConditionGroup;
   validation?: {
     minItems?: number;
     maxItems?: number;
     maxLength?: number;
+  };
+  ui?: {
+    rows?: number;
   };
 };
 
@@ -58,6 +62,7 @@ export type FormPage = {
   key: string;
   order: number;
   titleI18nKey: string;
+  softRequiredLeaveWarningI18nKey?: string;
   sections: FormSection[];
 };
 
@@ -66,6 +71,7 @@ export type FormSchema = {
     key: string;
     titleI18nKey: string;
     descriptionI18nKey?: string;
+    version?: number;
     pages: FormPage[];
   };
 };
@@ -120,4 +126,32 @@ export type ValidationIssue = {
 export type PageValidationResult = {
   hardMissing: ValidationIssue[];
   softMissing: string[];
+};
+
+export type ThemeConfig = {
+  tenantCode: string;
+  logo: {
+    url: string;
+    altI18nKey: string;
+  };
+  palette: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    bg: string;
+    text: string;
+    danger: string;
+    warning: string;
+  };
+  typography: {
+    fontFamily: string;
+    baseFontSizePx: number;
+  };
+};
+
+export type PublicFormRuntime = {
+  formId: string;
+  tenantId: string;
+  theme: ThemeConfig;
+  schema: FormSchema;
 };

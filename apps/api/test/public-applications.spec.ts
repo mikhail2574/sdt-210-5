@@ -245,6 +245,23 @@ describe("Public applications endpoints", () => {
     await app.close();
   });
 
+  it("returns effective runtime schema for a public form", async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/api/public/forms/${publicFormAId}`)
+      .expect(200);
+
+    expect(response.body.formId).toBe(publicFormAId);
+    expect(response.body.tenantId).toBe(tenantAId);
+    expect(response.body.schema.form.pages).toHaveLength(2);
+
+    const antragsdetailsPage = response.body.schema.form.pages.find((pageItem: { key: string }) => pageItem.key === "antragsdetails");
+    const messageField = antragsdetailsPage.sections
+      .flatMap((section: { blocks: Array<{ id: string }> }) => section.blocks)
+      .find((block: { id: string }) => block.id === "message");
+
+    expect(messageField.requirement).toBe("soft_required");
+  });
+
   it("creates a draft, persists page data and returns softMissing from tenant override", async () => {
     const response = await request(app.getHttpServer())
       .post(`/api/public/forms/${publicFormAId}/applications:draft`)

@@ -59,8 +59,6 @@ export function AntragsdetailsWizard({
   const navigate = onNavigate ?? router.push;
   const schema = useMemo(() => buildAntragsdetailsSchema(page), [page]);
   const hasHydrated = useAppStoreHydrated();
-  const persistedDraft = useAppStore((state) => state.formSessions[formId]?.pages[page.key] ?? null);
-  const persistedApplicationId = useAppStore((state) => state.formSessions[formId]?.applicationId ?? null);
   const saveFormPageDraft = useAppStore((state) => state.saveFormPageDraft);
   const setFormApplicationId = useAppStore((state) => state.setFormApplicationId);
   const [applicationId, setApplicationId] = useState<string | null>(initialApplicationId ?? null);
@@ -113,18 +111,16 @@ export function AntragsdetailsWizard({
   }, [clearErrors, isChangeKindVisible]);
 
   useEffect(() => {
-    if (!hasHydrated) {
+    if (!hasHydrated || didRestorePersistedState) {
       return;
     }
+
+    const persistedSession = useAppStore.getState().formSessions[formId];
+    const persistedDraft = persistedSession?.pages[page.key];
+    const persistedApplicationId = persistedSession?.applicationId ?? null;
 
     if (!initialApplicationId && persistedApplicationId) {
       setApplicationId((current) => current ?? persistedApplicationId);
-    }
-  }, [hasHydrated, initialApplicationId, persistedApplicationId]);
-
-  useEffect(() => {
-    if (!hasHydrated || didRestorePersistedState) {
-      return;
     }
 
     if (!persistedDraft) {
@@ -144,7 +140,7 @@ export function AntragsdetailsWizard({
       })
     );
     setDidRestorePersistedState(true);
-  }, [didRestorePersistedState, hasHydrated, initialApplicationId, initialValues, persistedApplicationId, persistedDraft, reset]);
+  }, [didRestorePersistedState, formId, hasHydrated, initialApplicationId, initialValues, page.key, reset]);
 
   useEffect(() => {
     if (!hasHydrated) {
