@@ -9,6 +9,43 @@
     "customerCredentials": "Demo customer credentials",
     "staffCredentials": "Demo staff credentials"
   },
+  "appShell": {
+    "navLabel": "Main navigation",
+    "home": "Home",
+    "about": "About",
+    "settings": "Settings",
+    "ocrDemo": "OCR demo",
+    "wizard": "Public wizard",
+    "customerLogin": "Customer login",
+    "backoffice": "Backoffice"
+  },
+  "aboutPage": {
+    "title": "About this demo",
+    "description": "This project assembles the public portal, customer status area, OCR demo and staff backoffice into one persistent end-to-end demo.",
+    "assemblyTitle": "Assemble first",
+    "assemblyDescription": "The app favors full reachability and persistent workflows over polished UI. Every major feature has a working route, trigger and saved result.",
+    "architectureTitle": "Architecture snapshot"
+  },
+  "settingsPage": {
+    "title": "Settings and persistence",
+    "description": "Use this page to inspect what is persisted in the backend and what is stored locally in the browser.",
+    "backendTitle": "Persistent backend snapshot",
+    "clientStateTitle": "Client state snapshot",
+    "hydrated": "Hydrated: {value}",
+    "preferredLocale": "Preferred locale: {locale}",
+    "resetLocalState": "Reset local browser state"
+  },
+  "ocrDemo": {
+    "title": "OCR demo",
+    "description": "Submit sample document text and store a simulated OCR extraction that survives page reloads.",
+    "fileName": "File name",
+    "sourceText": "Source text",
+    "submit": "Run OCR demo",
+    "running": "Running OCR demo…",
+    "recordsTitle": "Stored OCR runs",
+    "noRecords": "No OCR runs stored yet.",
+    "error": "OCR demo failed. Please try again."
+  },
   "theme": {
     "logoAlt": "Stadtwerke customer portal"
   },
@@ -303,7 +340,8 @@
     "timelineTitle": "Timeline",
     "missingTitle": "Missing information",
     "downloadPdf": "Download PDF",
-    "resume": "Continue application"
+    "resume": "Continue application",
+    "logout": "Log out"
   },
   "backoffice": {
     "productLabel": "Internal backoffice",

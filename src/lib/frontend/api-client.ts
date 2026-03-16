@@ -113,6 +113,9 @@ export function createBrowserFrontendApi(fetchImpl: FetchLike = defaultFetch): F
     customerAuth: {
       login(input) {
         return requestJson(fetchImpl, "/api/public/auth/login", createJsonRequestInit("POST", input));
+      },
+      async logout() {
+        await requestJson(fetchImpl, "/api/public/auth/logout", createJsonRequestInit("POST"));
       }
     },
     staffAuth: {
@@ -200,6 +203,11 @@ export function createBrowserFrontendApi(fetchImpl: FetchLike = defaultFetch): F
           `/api/tenants/${tenantId}/applications/${applicationId}/pages/${pageKey}`,
           createJsonRequestInit("PATCH", input)
         );
+      }
+    },
+    ocrDemo: {
+      createJob(input) {
+        return requestJson(fetchImpl, "/api/ocr-demo", createJsonRequestInit("POST", input));
       }
     }
   };

@@ -1,4 +1,4 @@
-import { getDemoApplicationDetail } from "@/lib/demo/demo-store";
+import { getDemoApplicationDetail, listDemoApplications } from "@/lib/demo/demo-store";
 
 export function buildApplicationDownload(applicationId: string) {
   const application = getDemoApplicationDetail(applicationId);
@@ -28,13 +28,7 @@ export function buildApplicationsCsv() {
     headers.join(",")
   ];
 
-  for (const line of ["demo-application-1", "demo-application-2"]) {
-    const application = getDemoApplicationDetail(line);
-
-    if (!application) {
-      continue;
-    }
-
+  for (const application of listDemoApplications()) {
     rows.push(
       [
         application.applicationId,
@@ -51,5 +45,5 @@ export function buildApplicationsCsv() {
 }
 
 function escapeCsv(value: string) {
-  return `"${value.replace(/"/g, "\"\"")}"`;
+  return `"${value.replace(/"/g, '""')}"`;
 }

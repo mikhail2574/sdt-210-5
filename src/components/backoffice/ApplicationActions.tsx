@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 
 type ApplicationActionsProps = {
   applicationId: string;
@@ -19,7 +19,7 @@ type ApplicationActionsProps = {
 export function ApplicationActions({ applicationId, editableFields, tenantId }: ApplicationActionsProps) {
   const t = useTranslations();
   const router = useRouter();
-  const { backoffice } = useFrontendApi();
+  const { error, loading, markApplicationRead, saveApplicationEdits, scheduleAppointment, transitionApplication } = usePortalApp();
   const [statusTarget, setStatusTarget] = useState("UNDER_REVIEW");
   const [statusNote, setStatusNote] = useState("");
   const [appointmentAt, setAppointmentAt] = useState("2026-03-17T10:00");
@@ -27,29 +27,26 @@ export function ApplicationActions({ applicationId, editableFields, tenantId }: 
   const [selectedFieldPath, setSelectedFieldPath] = useState(editableFields[0]?.fieldPath ?? "");
   const [newValue, setNewValue] = useState(editableFields[0]?.value ?? "");
   const [reason, setReason] = useState("Customer confirmed the update by phone.");
-  const [errorKey, setErrorKey] = useState<string | null>(null);
 
   async function runAction(action: () => Promise<void>) {
     try {
-      setErrorKey(null);
       await action();
       router.refresh();
-    } catch {
-      setErrorKey("backoffice.actionError");
-    }
+    } catch {}
   }
 
   return (
     <div className="action-grid">
-      {errorKey ? <p className="field-message">{t(errorKey)}</p> : null}
+      {error ? <p className="field-message">{t("backoffice.actionError")}</p> : null}
 
       <section className="action-card">
         <h3>{t("backoffice.markReadTitle")}</h3>
         <button
           className="secondary-button"
           onClick={() => {
-            void runAction(() => backoffice.markApplicationRead(tenantId, applicationId));
+            void runAction(() => markApplicationRead(tenantId, applicationId));
           }}
+          disabled={loading}
           type="button"
         >
           {t("backoffice.markRead")}
@@ -69,12 +66,13 @@ export function ApplicationActions({ applicationId, editableFields, tenantId }: 
           className="wizard-button"
           onClick={() => {
             void runAction(() =>
-              backoffice.transitionApplication(tenantId, applicationId, {
+              transitionApplication(tenantId, applicationId, {
                 toStatus: statusTarget,
                 note: statusNote
               })
             );
           }}
+          disabled={loading}
           type="button"
         >
           {t("backoffice.transitionSubmit")}
@@ -89,12 +87,13 @@ export function ApplicationActions({ applicationId, editableFields, tenantId }: 
           className="wizard-button"
           onClick={() => {
             void runAction(() =>
-              backoffice.scheduleAppointment(tenantId, applicationId, {
+              scheduleAppointment(tenantId, applicationId, {
                 scheduledAt: appointmentAt,
                 notes: appointmentNotes
               })
             );
           }}
+          disabled={loading}
           type="button"
         >
           {t("backoffice.appointmentSubmit")}
@@ -126,7 +125,7 @@ export function ApplicationActions({ applicationId, editableFields, tenantId }: 
             const pageKey = selectedFieldPath.split(".")[0];
 
             void runAction(() =>
-              backoffice.saveApplicationEdits(tenantId, applicationId, pageKey, {
+              saveApplicationEdits(tenantId, applicationId, pageKey, {
                 edits: [
                   {
                     fieldPath: selectedFieldPath,
@@ -137,6 +136,7 @@ export function ApplicationActions({ applicationId, editableFields, tenantId }: 
               })
             );
           }}
+          disabled={loading}
           type="button"
         >
           {t("backoffice.quickEditSubmit")}

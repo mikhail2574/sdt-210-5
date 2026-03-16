@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { buildApplicationDownload } from "@/lib/demo/downloads";
+import { getServerCustomerApplicationId } from "@/lib/demo/server-auth";
 
 type PdfRouteProps = {
   params: Promise<{
@@ -10,6 +11,12 @@ type PdfRouteProps = {
 
 export async function GET(_: Request, { params }: PdfRouteProps) {
   const { applicationId } = await params;
+  const sessionApplicationId = await getServerCustomerApplicationId();
+
+  if (sessionApplicationId !== applicationId) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const content = buildApplicationDownload(applicationId);
 
   if (!content) {

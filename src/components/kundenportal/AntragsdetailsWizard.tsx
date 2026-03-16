@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { ErrorSummary } from "@/components/kundenportal/ErrorSummary";
 import { LanguageSwitcher } from "@/components/kundenportal/LanguageSwitcher";
 import { SoftRequiredModal } from "@/components/kundenportal/SoftRequiredModal";
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 import { type AntragsdetailsFormValues, type FieldBlock, type FormPage, type ThemeConfig } from "@/lib/forms/types";
 import { buildAntragsdetailsSchema, getSoftMissingFields, isFieldVisible, normalizeValues } from "@/lib/forms/validation";
 import { type Locale } from "@/lib/i18n";
@@ -58,7 +58,7 @@ export function AntragsdetailsWizard({
   const t = useTranslations();
   const router = useRouter();
   const navigate = onNavigate ?? router.push;
-  const { publicApplications } = useFrontendApi();
+  const { savePublicPage } = usePortalApp();
   const schema = useMemo(() => buildAntragsdetailsSchema(page), [page]);
   const hasHydrated = useAppStoreHydrated();
   const saveFormPageDraft = useAppStore((state) => state.saveFormPageDraft);
@@ -157,7 +157,7 @@ export function AntragsdetailsWizard({
     setStatusKey(null);
 
     try {
-      const result = await publicApplications.savePage({
+      const result = await savePublicPage({
         applicationId,
         formId,
         pageKey: page.key,

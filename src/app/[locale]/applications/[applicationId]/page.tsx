@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CustomerLogoutButton } from "@/components/kundenportal/CustomerLogoutButton";
 import { PortalChrome } from "@/components/kundenportal/PortalChrome";
 import { getDemoCustomerApplication } from "@/lib/demo/demo-store";
 import { getResolvedFormRuntime } from "@/lib/demo/runtime";
+import { requireServerCustomerApplicationId } from "@/lib/demo/server-auth";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +25,7 @@ export default async function CustomerApplicationPage({ params }: CustomerApplic
   }
 
   const messages = await getMessages(locale as Locale);
+  await requireServerCustomerApplicationId(locale as Locale, applicationId);
   const application = getDemoCustomerApplication(applicationId);
 
   if (!application) {
@@ -86,6 +89,7 @@ export default async function CustomerApplicationPage({ params }: CustomerApplic
         <Link className="wizard-button" href={`/${locale}/forms/${application.formId}/${resumePageKey}?applicationId=${applicationId}`}>
           {messages.customerStatus.resume}
         </Link>
+        <CustomerLogoutButton locale={locale as Locale} />
       </div>
     </PortalChrome>
   );

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 import type { FormOverrideOperation } from "@/lib/forms/types";
 
 type FormOverrideEditorProps = {
@@ -16,7 +16,7 @@ type FormOverrideEditorProps = {
 export function FormOverrideEditor({ formId, initialOperations, tenantId }: FormOverrideEditorProps) {
   const t = useTranslations();
   const router = useRouter();
-  const { backoffice } = useFrontendApi();
+  const { error, loading, updateFormOverride } = usePortalApp();
   const [value, setValue] = useState(JSON.stringify(initialOperations, null, 2));
   const [errorKey, setErrorKey] = useState<string | null>(null);
 
@@ -37,7 +37,7 @@ export function FormOverrideEditor({ formId, initialOperations, tenantId }: Form
         }
 
         try {
-          await backoffice.updateFormOverride(tenantId, formId, operations);
+          await updateFormOverride(tenantId, formId, operations);
           router.refresh();
         } catch {
           setErrorKey("backoffice.actionError");
@@ -46,8 +46,8 @@ export function FormOverrideEditor({ formId, initialOperations, tenantId }: Form
     >
       <label htmlFor={`override-${formId}`}>{t("backoffice.overrideJson")}</label>
       <textarea className="field-control-textarea" id={`override-${formId}`} onChange={(event) => setValue(event.target.value)} rows={12} value={value} />
-      {errorKey ? <p className="field-message">{t(errorKey)}</p> : null}
-      <button className="wizard-button" type="submit">
+      {errorKey || error ? <p className="field-message">{t(errorKey ?? "backoffice.actionError")}</p> : null}
+      <button className="wizard-button" disabled={loading} type="submit">
         {t("backoffice.overrideSubmit")}
       </button>
     </form>

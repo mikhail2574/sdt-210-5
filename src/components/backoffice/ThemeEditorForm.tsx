@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 import type { ThemeConfig } from "@/lib/forms/types";
 
 type ThemeEditorFormProps = {
@@ -15,9 +15,8 @@ type ThemeEditorFormProps = {
 export function ThemeEditorForm({ tenantId, theme }: ThemeEditorFormProps) {
   const t = useTranslations();
   const router = useRouter();
-  const { backoffice } = useFrontendApi();
+  const { error, loading, updateTheme } = usePortalApp();
   const [draftTheme, setDraftTheme] = useState(theme);
-  const [errorKey, setErrorKey] = useState<string | null>(null);
 
   function patch(path: string, value: string) {
     setDraftTheme((current) => {
@@ -70,14 +69,11 @@ export function ThemeEditorForm({ tenantId, theme }: ThemeEditorFormProps) {
       className="stack-form"
       onSubmit={async (event) => {
         event.preventDefault();
-        setErrorKey(null);
 
         try {
-          await backoffice.updateTheme(tenantId, draftTheme);
+          await updateTheme(tenantId, draftTheme);
           router.refresh();
-        } catch {
-          setErrorKey("backoffice.actionError");
-        }
+        } catch {}
       }}
     >
       <label htmlFor="theme-primary">{t("backoffice.themePrimary")}</label>
@@ -92,9 +88,9 @@ export function ThemeEditorForm({ tenantId, theme }: ThemeEditorFormProps) {
       <label htmlFor="theme-font-size">{t("backoffice.themeFontSize")}</label>
       <input className="field-control" id="theme-font-size" onChange={(event) => patch("fontSize", event.target.value)} type="number" value={draftTheme.typography.baseFontSizePx} />
 
-      {errorKey ? <p className="field-message">{t(errorKey)}</p> : null}
+      {error ? <p className="field-message">{t("backoffice.actionError")}</p> : null}
 
-      <button className="wizard-button" type="submit">
+      <button className="wizard-button" disabled={loading} type="submit">
         {t("backoffice.themeSubmit")}
       </button>
     </form>

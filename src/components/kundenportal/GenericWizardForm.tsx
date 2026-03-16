@@ -7,9 +7,9 @@ import { useTranslations } from "next-intl";
 import { ErrorSummary } from "@/components/kundenportal/ErrorSummary";
 import { PortalChrome } from "@/components/kundenportal/PortalChrome";
 import { SoftRequiredModal } from "@/components/kundenportal/SoftRequiredModal";
-import { isFrontendApiError } from "@/lib/frontend/api-client";
+import { isFrontendApiError } from "@/services/api";
 import type { ValidationErrorPayload } from "@/lib/frontend/api-contract";
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 import { getPreviousWizardPageKey, type PublicWizardPageKey } from "@/lib/demo/public-flow";
 import {
   getSoftMissingWizardFields,
@@ -70,7 +70,7 @@ export function GenericWizardForm({
 }: GenericWizardFormProps) {
   const t = useTranslations();
   const router = useRouter();
-  const { publicApplications } = useFrontendApi();
+  const { savePublicPage } = usePortalApp();
   const page = useMemo(() => getWizardPageConfig(pageKey), [pageKey]);
   const hasHydrated = useAppStoreHydrated();
   const saveFormPageDraft = useAppStore((state) => state.saveFormPageDraft);
@@ -155,7 +155,7 @@ export function GenericWizardForm({
     setStatusKey(null);
 
     try {
-      const payload = await publicApplications.savePage({
+      const payload = await savePublicPage({
         applicationId,
         formId,
         pageKey,

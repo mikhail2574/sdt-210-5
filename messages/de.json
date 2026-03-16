@@ -9,6 +9,43 @@
     "customerCredentials": "Demo-Zugang Kunde",
     "staffCredentials": "Demo-Zugang Mitarbeitende"
   },
+  "appShell": {
+    "navLabel": "Hauptnavigation",
+    "home": "Start",
+    "about": "Über das Projekt",
+    "settings": "Einstellungen",
+    "ocrDemo": "OCR Demo",
+    "wizard": "Öffentlicher Wizard",
+    "customerLogin": "Kundenlogin",
+    "backoffice": "Backoffice"
+  },
+  "aboutPage": {
+    "title": "Über diese Demo",
+    "description": "Dieses Projekt verbindet öffentliches Kundenportal, Kundenstatusbereich, OCR-Demo und Staff-Backoffice zu einer persistenten End-to-End-Demo.",
+    "assemblyTitle": "Assemble First",
+    "assemblyDescription": "Die App priorisiert vollständige Erreichbarkeit und persistente Workflows vor poliertem UI. Jede Hauptfunktion hat eine erreichbare Route, einen Trigger und ein gespeichertes Ergebnis.",
+    "architectureTitle": "Architektur-Snapshot"
+  },
+  "settingsPage": {
+    "title": "Einstellungen und Persistenz",
+    "description": "Auf dieser Seite kannst du prüfen, was im Backend persistiert wird und was lokal im Browser gespeichert ist.",
+    "backendTitle": "Snapshot des persistenten Backends",
+    "clientStateTitle": "Snapshot des Client-Zustands",
+    "hydrated": "Hydriert: {value}",
+    "preferredLocale": "Bevorzugte Sprache: {locale}",
+    "resetLocalState": "Lokalen Browser-Zustand zurücksetzen"
+  },
+  "ocrDemo": {
+    "title": "OCR Demo",
+    "description": "Sende Beispieltext eines Dokuments ab und speichere eine simulierte OCR-Extraktion, die Reloads überlebt.",
+    "fileName": "Dateiname",
+    "sourceText": "Quelltext",
+    "submit": "OCR Demo ausführen",
+    "running": "OCR Demo läuft…",
+    "recordsTitle": "Gespeicherte OCR-Läufe",
+    "noRecords": "Noch keine OCR-Läufe gespeichert.",
+    "error": "OCR Demo fehlgeschlagen. Bitte versuche es erneut."
+  },
   "theme": {
     "logoAlt": "Stadtwerke Kundenportal"
   },
@@ -303,7 +340,8 @@
     "timelineTitle": "Verlauf",
     "missingTitle": "Fehlende Informationen",
     "downloadPdf": "PDF herunterladen",
-    "resume": "Antrag fortsetzen"
+    "resume": "Antrag fortsetzen",
+    "logout": "Abmelden"
   },
   "backoffice": {
     "productLabel": "Internes Backoffice",

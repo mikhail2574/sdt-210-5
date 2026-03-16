@@ -25,3 +25,13 @@ export async function getServerCustomerApplicationId() {
   const cookieStore = await cookies();
   return cookieStore.get(customerSessionCookieName)?.value ?? null;
 }
+
+export async function requireServerCustomerApplicationId(locale: Locale, applicationId: string) {
+  const sessionApplicationId = await getServerCustomerApplicationId();
+
+  if (!sessionApplicationId || sessionApplicationId !== applicationId) {
+    redirect(`/${locale}/login`);
+  }
+
+  return sessionApplicationId;
+}

@@ -97,6 +97,7 @@ export type SaveStaffPageEditsInput = {
 
 export interface CustomerAuthApi {
   login(input: CustomerLoginInput): Promise<CustomerLoginResponse>;
+  logout(): Promise<void>;
 }
 
 export interface StaffAuthApi {
@@ -119,9 +120,24 @@ export interface BackofficeApi {
   saveApplicationEdits(tenantId: string, applicationId: string, pageKey: string, input: SaveStaffPageEditsInput): Promise<void>;
 }
 
+export interface OcrDemoApi {
+  createJob(input: {
+    fileName: string;
+    sourceText: string;
+  }): Promise<{
+    id: string;
+    fileName: string;
+    sourceText: string;
+    extractedText: string;
+    suggestedValue: string | null;
+    createdAt: string;
+  }>;
+}
+
 export interface FrontendApi {
   customerAuth: CustomerAuthApi;
   staffAuth: StaffAuthApi;
   publicApplications: PublicApplicationsApi;
   backoffice: BackofficeApi;
+  ocrDemo: OcrDemoApi;
 }

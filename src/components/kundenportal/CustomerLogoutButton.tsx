@@ -6,25 +6,25 @@ import { useTranslations } from "next-intl";
 import { usePortalApp } from "@/hooks/usePortalApp";
 import type { Locale } from "@/lib/i18n";
 
-type LogoutButtonProps = {
+type CustomerLogoutButtonProps = {
   locale: Locale;
 };
 
-export function LogoutButton({ locale }: LogoutButtonProps) {
+export function CustomerLogoutButton({ locale }: CustomerLogoutButtonProps) {
   const router = useRouter();
   const t = useTranslations();
-  const { staffLogout } = usePortalApp();
+  const { customerLogout, loading } = usePortalApp();
 
   return (
     <button
-      className="secondary-button"
       onClick={async () => {
-        await staffLogout();
-        router.push(`/${locale}/backoffice/login`);
+        await customerLogout();
+        router.push(`/${locale}/login`);
       }}
+      disabled={loading}
       type="button"
     >
-      {t("backoffice.logout")}
+      {t("customerStatus.logout")}
     </button>
   );
 }

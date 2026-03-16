@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { useFrontendApi } from "@/lib/frontend/api-provider";
+import { usePortalApp } from "@/hooks/usePortalApp";
 
 type InviteUserFormProps = {
   tenantId: string;
@@ -13,28 +13,24 @@ type InviteUserFormProps = {
 export function InviteUserForm({ tenantId }: InviteUserFormProps) {
   const t = useTranslations();
   const router = useRouter();
-  const { backoffice } = useFrontendApi();
+  const { error, inviteUser, loading } = usePortalApp();
   const [email, setEmail] = useState("new.user@stadtwerke.demo");
   const [role, setRole] = useState("Sachbearbeitung");
-  const [errorKey, setErrorKey] = useState<string | null>(null);
 
   return (
     <form
       className="stack-form"
       onSubmit={async (event) => {
         event.preventDefault();
-        setErrorKey(null);
 
         try {
-          await backoffice.inviteUser(tenantId, {
+          await inviteUser(tenantId, {
             email,
             role
           });
 
           router.refresh();
-        } catch {
-          setErrorKey("backoffice.actionError");
-        }
+        } catch {}
       }}
     >
       <label htmlFor="invite-email">{t("backoffice.inviteEmail")}</label>
@@ -47,9 +43,9 @@ export function InviteUserForm({ tenantId }: InviteUserFormProps) {
         <option value="Installateur">Installateur</option>
       </select>
 
-      {errorKey ? <p className="field-message">{t(errorKey)}</p> : null}
+      {error ? <p className="field-message">{t("backoffice.actionError")}</p> : null}
 
-      <button className="wizard-button" type="submit">
+      <button className="wizard-button" disabled={loading} type="submit">
         {t("backoffice.inviteSubmit")}
       </button>
     </form>
