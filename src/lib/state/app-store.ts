@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { type AntragsdetailsFormValues } from "@/lib/forms/types";
+import type { IssuedCredential, StaffSession } from "@/lib/frontend/api-contract";
 import { defaultLocale, type Locale } from "@/lib/i18n";
 
-type FormPageDraft = Partial<AntragsdetailsFormValues>;
+type FormPageDraft = Record<string, unknown>;
 
 type FormSession = {
   applicationId: string | null;
@@ -18,16 +18,22 @@ type FormSession = {
 type AppStoreState = {
   preferredLocale: Locale;
   formSessions: Record<string, FormSession>;
+  backofficeSession: StaffSession | null;
+  issuedCredentials: Record<string, IssuedCredential>;
   setPreferredLocale: (locale: Locale) => void;
   saveFormPageDraft: (formId: string, pageKey: string, values: FormPageDraft) => void;
   setFormApplicationId: (formId: string, applicationId: string | null) => void;
   clearFormSession: (formId: string) => void;
+  setBackofficeSession: (session: StaffSession | null) => void;
+  saveIssuedCredential: (credential: IssuedCredential) => void;
 };
 
 const initialState = {
   preferredLocale: defaultLocale,
-  formSessions: {}
-} satisfies Pick<AppStoreState, "preferredLocale" | "formSessions">;
+  formSessions: {},
+  backofficeSession: null,
+  issuedCredentials: {}
+} satisfies Pick<AppStoreState, "preferredLocale" | "formSessions" | "backofficeSession" | "issuedCredentials">;
 
 export const useAppStore = create<AppStoreState>()(
   persist(
@@ -80,6 +86,19 @@ export const useAppStore = create<AppStoreState>()(
             formSessions: nextSessions
           };
         });
+      },
+      setBackofficeSession: (session) => {
+        set({
+          backofficeSession: session
+        });
+      },
+      saveIssuedCredential: (credential) => {
+        set((state) => ({
+          issuedCredentials: {
+            ...state.issuedCredentials,
+            [credential.applicationId]: credential
+          }
+        }));
       }
     }),
     {
@@ -87,35 +106,43 @@ export const useAppStore = create<AppStoreState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         preferredLocale: state.preferredLocale,
-        formSessions: state.formSessions
+        formSessions: state.formSessions,
+        backofficeSession: state.backofficeSession,
+        issuedCredentials: state.issuedCredentials
       })
     }
   )
 );
 
 export function useAppStoreHydrated() {
-  const [hydrated, setHydrated] = useState(useAppStore.persist.hasHydrated());
+  const persistApi = useAppStore.persist;
+  const [hydrated, setHydrated] = useState(persistApi ? persistApi.hasHydrated() : true);
 
   useEffect(() => {
-    const unsubscribeHydrate = useAppStore.persist.onHydrate(() => {
+    if (!persistApi) {
+      setHydrated(true);
+      return;
+    }
+
+    const unsubscribeHydrate = persistApi.onHydrate(() => {
       setHydrated(false);
     });
-    const unsubscribeFinish = useAppStore.persist.onFinishHydration(() => {
+    const unsubscribeFinish = persistApi.onFinishHydration(() => {
       setHydrated(true);
     });
 
-    setHydrated(useAppStore.persist.hasHydrated());
+    setHydrated(persistApi.hasHydrated());
 
     return () => {
       unsubscribeHydrate();
       unsubscribeFinish();
     };
-  }, []);
+  }, [persistApi]);
 
   return hydrated;
 }
 
 export function resetAppStore() {
   useAppStore.setState(initialState);
-  void useAppStore.persist.clearStorage();
+  void useAppStore.persist?.clearStorage();
 }

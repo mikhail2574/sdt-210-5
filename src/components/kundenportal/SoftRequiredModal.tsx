@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import type { FieldBlock } from "@/lib/forms/types";
 
 type SoftRequiredModalProps = {
-  fields: FieldBlock[];
+  fields: Array<FieldBlock | { id: string; labelKey: string }>;
   open: boolean;
   onClose: () => void;
   onSkip: () => void;
@@ -59,7 +59,7 @@ export function SoftRequiredModal({ fields, open, onClose, onSkip }: SoftRequire
         <p>{t("wizard.softRequired.description")}</p>
         <ul>
           {fields.map((field) => (
-            <li key={field.id}>{t(field.labelI18nKey)}</li>
+            <li key={field.id}>{t("labelI18nKey" in field ? field.labelI18nKey : field.labelKey)}</li>
           ))}
         </ul>
         <div className="wizard-modal-actions">

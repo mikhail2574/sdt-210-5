@@ -1,15 +1,39 @@
 import { type DataSourceOptions } from "typeorm";
 
+import { ApplicationAuditLogEntity } from "./entities/application-audit-log.entity";
 import { ApplicationEntity } from "./entities/application.entity";
 import { ApplicationPageDataEntity } from "./entities/application-page-data.entity";
+import { AttachmentEntity } from "./entities/attachment.entity";
+import { AppointmentEntity } from "./entities/appointment.entity";
 import { FormDefinitionEntity } from "./entities/form-definition.entity";
 import { FormOverrideEntity } from "./entities/form-override.entity";
+import { InvitationEntity } from "./entities/invitation.entity";
 import { TenantEntity } from "./entities/tenant.entity";
+import { TenantUserEntity } from "./entities/tenant-user.entity";
+import { UserEntity } from "./entities/user.entity";
 import { CreatePublicApplicationsTables1710000000000 } from "./migrations/1710000000000-create-public-applications-tables";
+import { AddBackofficeAuthAndWorkflowTables1710000001000 } from "./migrations/1710000001000-add-backoffice-auth-and-workflow-tables";
+import { AddAttachmentsTable1710000002000 } from "./migrations/1710000002000-add-attachments-table";
 
 export const databaseArtifacts = {
-  entities: [TenantEntity, FormDefinitionEntity, FormOverrideEntity, ApplicationEntity, ApplicationPageDataEntity],
-  migrations: [CreatePublicApplicationsTables1710000000000]
+  entities: [
+    TenantEntity,
+    UserEntity,
+    TenantUserEntity,
+    InvitationEntity,
+    FormDefinitionEntity,
+    FormOverrideEntity,
+    ApplicationEntity,
+    ApplicationPageDataEntity,
+    AttachmentEntity,
+    ApplicationAuditLogEntity,
+    AppointmentEntity
+  ],
+  migrations: [
+    CreatePublicApplicationsTables1710000000000,
+    AddBackofficeAuthAndWorkflowTables1710000001000,
+    AddAttachmentsTable1710000002000
+  ]
 };
 
 export function createApiDataSourceOptions(overrides: Partial<DataSourceOptions> = {}): DataSourceOptions {

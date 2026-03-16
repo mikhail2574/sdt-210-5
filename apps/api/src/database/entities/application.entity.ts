@@ -53,6 +53,9 @@ export class ApplicationEntity {
   @Column({ name: "completed_at", type: "timestamp with time zone", nullable: true })
   completedAt!: Date | null;
 
+  @Column({ name: "timeline_json", type: "jsonb", default: () => "'[]'" })
+  timelineJson!: Array<Record<string, unknown>>;
+
   @OneToMany(() => ApplicationPageDataEntity, (pageData) => pageData.application)
   pageData!: ApplicationPageDataEntity[];
 }

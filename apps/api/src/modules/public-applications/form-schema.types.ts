@@ -121,11 +121,14 @@ export type FormOverrideOperation =
 export type ValidationIssue = {
   path: string;
   issue: string;
+  labelKey?: string;
+  kind?: "field" | "attachment";
 };
 
 export type PageValidationResult = {
   hardMissing: ValidationIssue[];
   softMissing: string[];
+  softMissingDetails?: ValidationIssue[];
 };
 
 export type ThemeConfig = {

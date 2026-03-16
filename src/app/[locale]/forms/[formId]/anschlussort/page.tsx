@@ -1,7 +1,13 @@
-import Link from "next/link";
-import { getMessages, isLocale } from "@/lib/i18n";
+import { notFound } from "next/navigation";
 
-type AnschlussortPlaceholderProps = {
+import { GenericWizardForm } from "@/components/kundenportal/GenericWizardForm";
+import { getResolvedFormRuntime } from "@/lib/demo/runtime";
+import { getDraft } from "@/lib/forms/store";
+import { isLocale, type Locale } from "@/lib/i18n";
+
+export const dynamic = "force-dynamic";
+
+type AnschlussortPageProps = {
   params: Promise<{
     locale: string;
     formId: string;
@@ -11,26 +17,25 @@ type AnschlussortPlaceholderProps = {
   }>;
 };
 
-export default async function AnschlussortPlaceholder({ params, searchParams }: AnschlussortPlaceholderProps) {
+export default async function AnschlussortPage({ params, searchParams }: AnschlussortPageProps) {
   const { locale, formId } = await params;
   const { applicationId } = await searchParams;
 
   if (!isLocale(locale)) {
-    return null;
+    notFound();
   }
 
-  const messages = await getMessages(locale);
+  const runtime = await getResolvedFormRuntime(formId);
+  const draft = applicationId ? getDraft(applicationId) : null;
 
   return (
-    <main className="home-shell">
-      <div className="placeholder-card">
-        <h1>{messages.placeholder.anschlussort.title}</h1>
-        <p>{messages.placeholder.anschlussort.description}</p>
-        {applicationId ? <p>{applicationId}</p> : null}
-        <Link className="secondary-button" href={`/${locale}/forms/${formId}/antragsdetails${applicationId ? `?applicationId=${applicationId}` : ""}`}>
-          {messages.placeholder.anschlussort.backLink}
-        </Link>
-      </div>
-    </main>
+    <GenericWizardForm
+      applicationId={applicationId ?? null}
+      formId={formId}
+      initialValues={draft?.pageData["anschlussort"]}
+      locale={locale as Locale}
+      pageKey="anschlussort"
+      theme={runtime.theme}
+    />
   );
 }

@@ -1,9 +1,13 @@
 {
   "home": {
     "title": "Kundenportal Demo",
-    "description": "Öffne die Wizard-Seite antragsdetails mit Theme, i18n und Autosave.",
-    "demoLink": "Demo-Formular öffnen",
-    "softLink": "Soft-required Variante öffnen"
+    "description": "Durchlaufe den kompletten öffentlichen Wizard, den Kundenstatusbereich und das Staff-Backoffice mit vorbereiteten Demo-Daten.",
+    "demoLink": "Standardformular öffnen",
+    "softLink": "Soft-required Formular öffnen",
+    "customerLogin": "Kundenlogin",
+    "backofficeLogin": "Backoffice Login",
+    "customerCredentials": "Demo-Zugang Kunde",
+    "staffCredentials": "Demo-Zugang Mitarbeitende"
   },
   "theme": {
     "logoAlt": "Stadtwerke Kundenportal"
@@ -18,13 +22,42 @@
   "forms": {
     "hausanschluss": {
       "title": "Hausanschluss",
-      "description": "Bitte gib die wichtigsten Antragsdetails an."
+      "description": "Bitte gib die wichtigsten Angaben für den gewünschten Anschluss an."
     }
   },
   "pages": {
     "antragsdetails": {
       "title": "Antragsdetails",
-      "info": "Wähle Medium, Art des Antrags und den gewünschten Termin. Pflichtfelder blockieren den nächsten Schritt."
+      "description": "Wähle die gewünschten Medien, die Antragsart und den Wunschtermin.",
+      "info": "Pflichtfelder blockieren den nächsten Schritt. Soft-required Felder zeigen eine Warnung und können später ergänzt werden."
+    },
+    "anschlussort": {
+      "title": "Anschlussort",
+      "description": "Erfasse den Ort des Anschlusses, das Objekt und unterstützende Dateien.",
+      "info": "Wenn die Straßenadresse noch nicht bekannt ist, kannst du stattdessen Gemarkung und Flurstück erfassen."
+    },
+    "kontaktdaten": {
+      "title": "Kontaktdaten",
+      "description": "Erfasse Antragsteller und technischen Ansprechpartner.",
+      "info": "Die E-Mail-Bestätigung ist erforderlich, weil Statusinformationen an diese Adresse gesendet werden."
+    },
+    "technischeDaten": {
+      "title": "Technische Daten",
+      "description": "Beschreibe Installateur, Leistungsbedarf und relevante Geräte.",
+      "info": "Diese MVP-Demo deckt den strombezogenen Teil des Legacy-Prozesses ab."
+    },
+    "rechtlicheHinweise": {
+      "title": "Rechtliche Hinweise",
+      "description": "Prüfe die für das Absenden erforderlichen Einwilligungen.",
+      "info": "Alle Checkboxen unten sind blockierende Pflichtangaben."
+    },
+    "uebersicht": {
+      "title": "Übersicht und Absenden",
+      "description": "Prüfe alle Angaben, offene Soft-required Felder und sende den Antrag ab."
+    },
+    "final": {
+      "title": "Antrag abgesendet",
+      "description": "Deine Zugangsdaten wurden erstellt. Du kannst dich jederzeit erneut einloggen und fehlende Informationen ergänzen."
     }
   },
   "sections": {
@@ -36,6 +69,27 @@
     },
     "planung": {
       "title": "Planung"
+    },
+    "address": {
+      "title": "Adresse"
+    },
+    "object": {
+      "title": "Anschlussobjekt"
+    },
+    "uploads": {
+      "title": "Lageplan und Anlagen"
+    },
+    "applicant": {
+      "title": "Antragsteller"
+    },
+    "technicalContact": {
+      "title": "Technischer Ansprechpartner"
+    },
+    "energy": {
+      "title": "Energiedaten"
+    },
+    "consents": {
+      "title": "Erforderliche Einwilligungen"
     }
   },
   "fields": {
@@ -47,16 +101,107 @@
     },
     "changeKind": {
       "label": "Art der Veränderung",
-      "help": "Dieses Feld wird sichtbar, wenn du „Änderung“ wählst."
+      "help": "Dieses Feld wird sichtbar, wenn du „Änderung“ auswählst."
     },
     "wunschtermin": {
       "label": "Wunschtermin",
-      "help": "Bitte wähle ein Datum im Format TT.MM.JJJJ."
+      "help": "Bitte wähle ein Zieldatum."
     },
     "message": {
       "label": "Nachricht",
       "help": "Optional, maximal 255 Zeichen.",
-      "helpWithHint": "Optional, maximal 255 Zeichen. Tenant-Override kann Hilfe oder Verhalten anpassen."
+      "helpWithHint": "Optional, maximal 255 Zeichen. Tenant-Overrides können Hilfe oder Verhalten anpassen."
+    },
+    "addressUnknown": {
+      "label": "Straße oder Hausnummer noch nicht bekannt",
+      "help": "Schaltet auf eine Eingabe über Gemarkung und Flurstück um."
+    },
+    "postalCode": {
+      "label": "PLZ"
+    },
+    "city": {
+      "label": "Ort"
+    },
+    "street": {
+      "label": "Straße"
+    },
+    "houseNumber": {
+      "label": "Hausnummer"
+    },
+    "district": {
+      "label": "Gemarkung"
+    },
+    "plot": {
+      "label": "Flurstück"
+    },
+    "objectType": {
+      "label": "Objektart"
+    },
+    "usageType": {
+      "label": "Nutzungsart",
+      "help": "Optionales Detail für die interne Priorisierung."
+    },
+    "lageplanUploads": {
+      "label": "Lageplan Uploads",
+      "help": "Lade Lageplan, Grundriss oder ähnliche Dokumente hoch. Im Demo-Modus werden nur Dateimetadaten gespeichert."
+    },
+    "salutation": {
+      "label": "Anrede"
+    },
+    "firstName": {
+      "label": "Vorname"
+    },
+    "lastName": {
+      "label": "Nachname"
+    },
+    "email": {
+      "label": "E-Mail"
+    },
+    "confirmEmail": {
+      "label": "E-Mail bestätigen"
+    },
+    "phone": {
+      "label": "Telefon"
+    },
+    "applicantIsTechnicalContact": {
+      "label": "Antragsteller ist auch technischer Ansprechpartner",
+      "help": "Wenn nicht aktiviert, wird ein Name für den technischen Ansprechpartner soft-required."
+    },
+    "technicalContactName": {
+      "label": "Name technischer Ansprechpartner",
+      "help": "Gib hier Planer, Installateur oder Baustellenkontakt an."
+    },
+    "electricianMode": {
+      "label": "Status Elektroinstallateur"
+    },
+    "connectionPowerKw": {
+      "label": "Angeforderte Anschlussleistung (kW)",
+      "help": "Gib den geplanten Gesamtleistungsbedarf an."
+    },
+    "hasWallbox": {
+      "label": "Wallbox geplant"
+    },
+    "wallboxCount": {
+      "label": "Anzahl Wallboxen"
+    },
+    "hasPv": {
+      "label": "PV-Anlage geplant"
+    },
+    "technicalNotes": {
+      "label": "Technische Hinweise",
+      "help": "Nutze dieses Feld für Sondergeräte oder technische Hinweise."
+    },
+    "privacyPolicyAccepted": {
+      "label": "Ich habe die Datenschutzerklärung gelesen.",
+      "help": "Die Datenschutzerklärung beschreibt Speicherung und Verarbeitung der Antragsdaten."
+    },
+    "dataProcessingAccepted": {
+      "label": "Ich stimme der Verarbeitung meiner Antragsdaten zu.",
+      "help": "Erforderlich für Bearbeitung und Rückfragen."
+    },
+    "emailCommunicationAccepted": {
+      "label": "Ich stimme der Kommunikation per E-Mail zu.",
+      "help": "E-Mail wird für Statusupdates und Terminabstimmung verwendet."
     }
   },
   "media": {
@@ -73,25 +218,185 @@
     "erweiterung": "Anlagenerweiterung",
     "zusammenlegung": "Zusammenlegung"
   },
+  "options": {
+    "objectType": {
+      "gebaeude": "Gebäude",
+      "freiflaeche": "Freifläche",
+      "sonstiges": "Sonstiges"
+    },
+    "usageType": {
+      "einfamilienhaus": "Einfamilienhaus",
+      "mehrfamilienhaus": "Mehrfamilienhaus",
+      "gewerbe": "Gewerbe"
+    },
+    "salutation": {
+      "frau": "Frau",
+      "herr": "Herr",
+      "divers": "Divers"
+    },
+    "electricianMode": {
+      "registered": "Eingetragener Installateur bereits ausgewählt",
+      "guest": "Installateur wird später eingeladen",
+      "unknown": "Installateur noch nicht bekannt"
+    }
+  },
   "wizard": {
     "headerTitle": "White-Label Kundenportal",
+    "stepperLabel": "Wizard-Fortschritt",
     "next": "Weiter",
+    "back": "Zurück",
     "nextStepHint": "Anschlussort",
     "selectPlaceholder": "Bitte auswählen",
     "requiredBadge": "Pflicht",
     "softRequiredBadge": "Später möglich",
     "errorSummaryTitle": "Bitte korrigiere die markierten Felder.",
     "errorSummaryDescription": "Die Seite enthält Validierungsfehler.",
+    "removeFile": "Entfernen",
     "softRequired": {
-      "title": "Fehlende optionale Pflichtangaben",
-      "description": "Diese Angaben können übersprungen werden, blockieren aber später die Bearbeitung.",
-      "leaveWarning": "Soft-required Felder können übersprungen werden.",
+      "title": "Fehlende Soft-required Angaben",
+      "description": "Diese Felder können jetzt übersprungen werden, blockieren aber später die Bearbeitung.",
+      "leaveWarning": "Dieses Soft-required Feld kann später ergänzt werden.",
       "fillNow": "Jetzt ausfüllen",
-      "skip": "Überspringen"
+      "skip": "Jetzt überspringen"
     },
     "saving": "Speichern…",
     "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut.",
     "saved": "Entwurf gespeichert."
+  },
+  "summary": {
+    "missingTitle": "Offene Angaben vor der Bearbeitung",
+    "missingHard": "Fehlendes Pflichtfeld: {field}",
+    "missingSoft": "Fehlendes Soft-required Feld: {field}",
+    "missingAttachment": "Fehlende Anlage: {field}",
+    "fieldCount": "{count} Felder erfasst",
+    "edit": "Angaben bearbeiten",
+    "submit": "Antrag absenden",
+    "submitting": "Sende…",
+    "submitError": "Absenden fehlgeschlagen. Bitte erneut versuchen.",
+    "booleanYes": "Ja",
+    "booleanNo": "Nein",
+    "emptyValue": "Nicht angegeben"
+  },
+  "finalPage": {
+    "trackingCode": "Tracking-Code",
+    "password": "Passwort",
+    "missingTitle": "Fehlende Informationen",
+    "missingLinkPrefix": "Anzeigen",
+    "downloadPdf": "PDF herunterladen",
+    "relogin": "Kundenstatus öffnen"
+  },
+  "customerLogin": {
+    "title": "Kundenlogin",
+    "description": "Nutze Tracking-Code und Passwort, um einen Antrag erneut zu öffnen.",
+    "trackingCode": "Tracking-Code",
+    "password": "Passwort",
+    "submit": "Einloggen",
+    "loading": "Anmeldung läuft…",
+    "error": "Login fehlgeschlagen. Bitte prüfe die Zugangsdaten.",
+    "demoHint": "Demo-Zugang:",
+    "backHome": "Zur Startseite"
+  },
+  "customerStatus": {
+    "title": "Antragsstatus",
+    "description": "Prüfe Status, Verlauf und offene Informationen.",
+    "statusLabel": "Aktueller Status",
+    "timelineTitle": "Verlauf",
+    "missingTitle": "Fehlende Informationen",
+    "downloadPdf": "PDF herunterladen",
+    "resume": "Antrag fortsetzen"
+  },
+  "backoffice": {
+    "productLabel": "Internes Backoffice",
+    "title": "Antrags-Backoffice",
+    "navLabel": "Backoffice Navigation",
+    "nav": {
+      "dashboard": "Dashboard",
+      "applications": "Anträge",
+      "invitations": "Einladungen",
+      "theme": "Theme",
+      "forms": "Form-Overrides"
+    },
+    "notifications": "Benachrichtigungen",
+    "notificationsEmpty": "Keine ungelesenen Benachrichtigungen.",
+    "logout": "Abmelden",
+    "loginTitle": "Staff Login",
+    "loginDescription": "Der Demo-Zugang nutzt ein vorbereitetes Konto und die lokale Next.js Demo-API.",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "loggingIn": "Anmeldung läuft…",
+    "loginSubmit": "Einloggen",
+    "loginError": "Login fehlgeschlagen. Bitte prüfe die Zugangsdaten.",
+    "metrics": {
+      "unread": "Ungelesene Anträge",
+      "incomplete": "Unvollständig eingereicht",
+      "scheduled": "Heute terminiert"
+    },
+    "quickLinks": "Schnellzugriffe",
+    "quickUnread": "Ungelesene Anträge öffnen",
+    "quickIncomplete": "Unvollständige Einreichungen öffnen",
+    "quickTheme": "Tenant Theme bearbeiten",
+    "applicationsTitle": "Anträge",
+    "applicationsDescription": "Filtere nach Status oder Lesestatus und öffne die Detailansicht zur Bearbeitung.",
+    "exportCsv": "CSV exportieren",
+    "filters": {
+      "allStatuses": "Alle Status",
+      "allReadStates": "Alle Lesestatus",
+      "unreadOnly": "Nur ungelesen",
+      "apply": "Filter anwenden"
+    },
+    "columns": {
+      "createdAt": "Erstellt",
+      "trackingCode": "Tracking-Code",
+      "form": "Formular",
+      "status": "Status",
+      "customer": "Kundenübersicht"
+    },
+    "unreadBadge": "Ungelesen",
+    "downloadPdf": "PDF herunterladen",
+    "openCustomerView": "Kundenansicht öffnen",
+    "statusTitle": "Statusübersicht",
+    "timelineTitle": "Bearbeitungsverlauf",
+    "modifiedFieldsTitle": "Vom Staff geänderte Felder",
+    "auditTitle": "Audit-Log",
+    "auditChangedTo": "geändert zu",
+    "markReadTitle": "Lesestatus",
+    "markRead": "Als gelesen markieren",
+    "transitionTitle": "Statuswechsel",
+    "transitionSubmit": "Status anwenden",
+    "appointmentTitle": "Termin vereinbaren",
+    "appointmentSubmit": "Termin speichern",
+    "quickEditTitle": "Schneller Edit-Modus",
+    "quickEditSubmit": "Staff-Änderung speichern",
+    "invitationsTitle": "Einladungen",
+    "invitationsDescription": "Lade weitere Mitarbeitende, Installateure oder Admins in den Tenant ein.",
+    "inviteNew": "Nutzer einladen",
+    "inviteEmail": "E-Mail",
+    "inviteRole": "Rolle",
+    "inviteSubmit": "Einladung senden",
+    "sentInvitations": "Versendete Einladungen",
+    "themeTitle": "Theme Einstellungen",
+    "themeDescription": "Aktualisiere Tenant-Farben und Typografie für das öffentliche Portal.",
+    "themeEditor": "Theme Editor",
+    "themePreview": "Vorschau",
+    "themePreviewCopy": "Diese Vorschau spiegelt die aktuelle Tenant-Palette im öffentlichen Portal wider.",
+    "themePreviewButton": "Vorschau Aktion",
+    "themePrimary": "Primärfarbe",
+    "themeSecondary": "Sekundärfarbe",
+    "themeAccent": "Akzentfarbe",
+    "themeFontSize": "Basis-Schriftgröße",
+    "themeSubmit": "Theme speichern",
+    "formsTitle": "Form-Overrides",
+    "formsDescription": "Bearbeite die Tenant-Overrides, die zum Aufbau des effektiven Formularschemas verwendet werden.",
+    "overrideJson": "Override-JSON",
+    "overrideSubmit": "Override speichern",
+    "actionError": "Aktion fehlgeschlagen. Bitte versuche es erneut.",
+    "overrideError": "Ungültiges JSON. Bitte gib ein valides Override-Array an."
+  },
+  "validation": {
+    "requiredField": "{field} ist erforderlich.",
+    "requiredAttachment": "{field} ist erforderlich, bevor die Bearbeitung fortgesetzt werden kann.",
+    "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "invalidNumber": "Bitte gib eine gültige positive Zahl ein."
   },
   "errors": {
     "selectedMedia": {
@@ -109,18 +414,14 @@
     },
     "message": {
       "maxLength": "Die Nachricht darf maximal 255 Zeichen lang sein."
+    },
+    "confirmEmail": {
+      "mismatch": "Die E-Mail-Bestätigung stimmt nicht überein."
     }
   },
   "links": {
     "privacy": "Datenschutzerklärung",
     "imprint": "Impressum",
     "accessibility": "Barrierefreiheit"
-  },
-  "placeholder": {
-    "anschlussort": {
-      "title": "Nächster Schritt: Anschlussort",
-      "description": "Autosave war erfolgreich. Diese Demo fokussiert nur die Seite antragsdetails.",
-      "backLink": "Zurück zu Antragsdetails"
-    }
   }
 }

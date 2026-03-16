@@ -6,6 +6,13 @@ export const demoBaseFormId = "10000000-0000-4000-8000-000000000010";
 export const demoPublicFormId = "10000000-0000-4000-8000-000000000101";
 export const demoSoftPublicFormId = "10000000-0000-4000-8000-000000000102";
 export const demoMessageOverrideId = "10000000-0000-4000-8000-000000000201";
+export const demoStaffUserId = "10000000-0000-4000-8000-000000000301";
+export const demoStaffMembershipId = "10000000-0000-4000-8000-000000000302";
+export const demoInvitationId = "10000000-0000-4000-8000-000000000303";
+export const demoApplicationId = "10000000-0000-4000-8000-000000000401";
+export const demoApplicationPageDataId = "10000000-0000-4000-8000-000000000402";
+export const demoApplicationAuditId = "10000000-0000-4000-8000-000000000403";
+export const demoAppointmentId = "10000000-0000-4000-8000-000000000404";
 
 export const demoTheme = {
   tenantCode: "P001",

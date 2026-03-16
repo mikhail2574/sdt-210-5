@@ -40,6 +40,21 @@ export class EffectiveFormService {
     };
   }
 
+  async resolveBaseFormForPublicForm(formId: string) {
+    const publicForm = await this.formDefinitionRepository.findOne({
+      where: {
+        id: formId,
+        isPublished: true
+      }
+    });
+
+    if (!publicForm || !publicForm.tenantId) {
+      throw new ApiResourceNotFoundException("Form not found");
+    }
+
+    return this.resolveBaseForm(publicForm);
+  }
+
   async resolveByApplication(application: ApplicationEntity): Promise<EffectiveFormContext> {
     const publicForm = await this.formDefinitionRepository.findOne({
       where: {
@@ -84,17 +99,7 @@ export class EffectiveFormService {
   }
 
   private async buildEffectiveSchema(publicForm: FormDefinitionEntity): Promise<FormSchema> {
-    const baseForm =
-      (await this.formDefinitionRepository.findOne({
-        where: {
-          key: publicForm.key,
-          tenantId: IsNull(),
-          isPublished: true
-        },
-        order: {
-          version: "DESC"
-        }
-      })) ?? publicForm;
+    const baseForm = await this.resolveBaseForm(publicForm);
 
     const baseSchema = this.cloneSchema((baseForm.schemaJson ?? publicForm.schemaJson) as FormSchema);
     const overrides = await this.formOverrideRepository.find({
@@ -105,6 +110,21 @@ export class EffectiveFormService {
     });
 
     return overrides.reduce((schema, override) => this.applyOperations(schema, override.operationsJson as FormOverrideOperation[]), baseSchema);
+  }
+
+  private async resolveBaseForm(publicForm: FormDefinitionEntity) {
+    return (
+      (await this.formDefinitionRepository.findOne({
+        where: {
+          key: publicForm.key,
+          tenantId: IsNull(),
+          isPublished: true
+        },
+        order: {
+          version: "DESC"
+        }
+      })) ?? publicForm
+    );
   }
 
   private applyOperations(schema: FormSchema, operations: FormOverrideOperation[]) {

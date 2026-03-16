@@ -29,6 +29,18 @@ export default async function LocaleHomePage({ params }: LocaleHomePageProps) {
           <Link className="secondary-button" href={`/${locale}/forms/hausanschluss-soft-demo/antragsdetails`}>
             {messages.home.softLink}
           </Link>
+          <Link className="secondary-button" href={`/${locale}/login`}>
+            {messages.home.customerLogin}
+          </Link>
+          <Link className="secondary-button" href={`/${locale}/backoffice/login`}>
+            {messages.home.backofficeLogin}
+          </Link>
+        </div>
+        <div className="demo-credentials">
+          <p>{messages.home.customerCredentials}</p>
+          <strong>317-000-HA01016 / DemoPass!2026</strong>
+          <p>{messages.home.staffCredentials}</p>
+          <strong>staff@stadtwerke.demo / demo12345</strong>
         </div>
       </div>
     </main>

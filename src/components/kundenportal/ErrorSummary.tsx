@@ -6,6 +6,7 @@ type ErrorSummaryProps = {
   errors: Array<{
     fieldId: string;
     messageKey: string;
+    messageText?: string;
   }>;
 };
 
@@ -23,7 +24,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
       <ul>
         {errors.map((error) => (
           <li key={error.fieldId}>
-            <a href={`#field-${error.fieldId}`}>{t(error.messageKey)}</a>
+            <a href={`#field-${error.fieldId}`}>{error.messageText ?? t(error.messageKey)}</a>
           </li>
         ))}
       </ul>

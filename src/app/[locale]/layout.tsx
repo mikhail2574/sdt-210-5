@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { HtmlLangSync } from "@/components/HtmlLangSync";
+import { FrontendApiProvider } from "@/lib/frontend/api-provider";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 type LocaleLayoutProps = {
@@ -23,8 +24,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <HtmlLangSync locale={locale} />
-      {children}
+      <FrontendApiProvider>
+        <HtmlLangSync locale={locale} />
+        {children}
+      </FrontendApiProvider>
     </NextIntlClientProvider>
   );
 }

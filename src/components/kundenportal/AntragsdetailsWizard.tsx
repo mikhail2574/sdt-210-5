@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { ErrorSummary } from "@/components/kundenportal/ErrorSummary";
 import { LanguageSwitcher } from "@/components/kundenportal/LanguageSwitcher";
 import { SoftRequiredModal } from "@/components/kundenportal/SoftRequiredModal";
+import { useFrontendApi } from "@/lib/frontend/api-provider";
 import { type AntragsdetailsFormValues, type FieldBlock, type FormPage, type ThemeConfig } from "@/lib/forms/types";
 import { buildAntragsdetailsSchema, getSoftMissingFields, isFieldVisible, normalizeValues } from "@/lib/forms/validation";
 import { type Locale } from "@/lib/i18n";
@@ -57,6 +58,7 @@ export function AntragsdetailsWizard({
   const t = useTranslations();
   const router = useRouter();
   const navigate = onNavigate ?? router.push;
+  const { publicApplications } = useFrontendApi();
   const schema = useMemo(() => buildAntragsdetailsSchema(page), [page]);
   const hasHydrated = useAppStoreHydrated();
   const saveFormPageDraft = useAppStore((state) => state.saveFormPageDraft);
@@ -154,42 +156,19 @@ export function AntragsdetailsWizard({
     setIsSaving(true);
     setStatusKey(null);
 
-    const isNewDraft = !applicationId;
-    const endpoint = isNewDraft
-      ? `/api/public/forms/${formId}/applications:draft`
-      : `/api/public/applications/${applicationId}/pages/antragsdetails`;
-    const method = isNewDraft ? "POST" : "PUT";
-    const body = isNewDraft
-      ? {
-          pageKey: page.key,
-          data: valuesToSave
-        }
-      : {
-          data: valuesToSave,
-          clientRevision: Date.now()
-        };
-
     try {
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
+      const result = await publicApplications.savePage({
+        applicationId,
+        formId,
+        pageKey: page.key,
+        data: valuesToSave
       });
 
-      if (!response.ok) {
-        throw new Error("request_failed");
-      }
-
-      const result = await response.json();
-      const nextApplicationId = result.applicationId ?? applicationId;
-
-      setApplicationId(nextApplicationId);
-      setFormApplicationId(formId, nextApplicationId);
+      setApplicationId(result.applicationId);
+      setFormApplicationId(formId, result.applicationId);
       saveFormPageDraft(formId, page.key, valuesToSave);
       setStatusKey("wizard.saved");
-      navigate(`/${locale}/forms/${formId}/${result.nextPageKey}?applicationId=${nextApplicationId}`);
+      navigate(`/${locale}/forms/${formId}/${result.nextPageKey}?applicationId=${result.applicationId}`);
     } catch {
       setStatusKey("wizard.saveError");
     } finally {

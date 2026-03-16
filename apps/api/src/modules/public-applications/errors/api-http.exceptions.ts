@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 
 type ErrorDetail = {
   path: string;
@@ -30,5 +30,17 @@ export class ApiResourceNotFoundException extends NotFoundException {
 export class ApiTenantIsolationException extends ForbiddenException {
   constructor(message = "Cross-tenant application access denied") {
     super(buildErrorBody("FORBIDDEN", message));
+  }
+}
+
+export class ApiUnauthorizedException extends UnauthorizedException {
+  constructor(message = "Authentication required") {
+    super(buildErrorBody("UNAUTHORIZED", message));
+  }
+}
+
+export class ApiConflictException extends ConflictException {
+  constructor(message: string) {
+    super(buildErrorBody("CONFLICT", message));
   }
 }

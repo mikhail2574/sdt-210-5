@@ -1,0 +1,98 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import { PortalChrome } from "@/components/kundenportal/PortalChrome";
+import { getDemoApplicationDetail } from "@/lib/demo/demo-store";
+import { getResolvedFormRuntime } from "@/lib/demo/runtime";
+import { isLocale, getMessages, type Locale } from "@/lib/i18n";
+
+export const dynamic = "force-dynamic";
+
+type FinalPageProps = {
+  params: Promise<{
+    locale: string;
+    formId: string;
+  }>;
+  searchParams: Promise<{
+    applicationId?: string;
+  }>;
+};
+
+export default async function FinalPage({ params, searchParams }: FinalPageProps) {
+  const { locale, formId } = await params;
+  const { applicationId } = await searchParams;
+
+  if (!isLocale(locale)) {
+    notFound();
+  }
+
+  if (!applicationId) {
+    redirect(`/${locale}/forms/${formId}/antragsdetails`);
+  }
+
+  const messages = await getMessages(locale as Locale);
+  const runtime = await getResolvedFormRuntime(formId);
+  const application = getDemoApplicationDetail(applicationId);
+
+  if (!application || !application.trackingCode || !application.password) {
+    notFound();
+  }
+
+  const missingItems = [
+    ...application.missingSummary.hard,
+    ...application.missingSummary.soft,
+    ...application.missingSummary.attachments
+  ];
+
+  return (
+    <PortalChrome currentPageKey="final" locale={locale as Locale} theme={runtime.theme}>
+      <h1 className="wizard-page-title">{messages.pages.final.title}</h1>
+      <p className="wizard-page-description">{messages.pages.final.description}</p>
+
+      <div className="credential-card">
+        <div>
+          <p>{messages.finalPage.trackingCode}</p>
+          <strong>{application.trackingCode}</strong>
+        </div>
+        <div>
+          <p>{messages.finalPage.password}</p>
+          <strong>{application.password}</strong>
+        </div>
+      </div>
+
+      {missingItems.length > 0 ? (
+        <section className="wizard-summary warning-summary">
+          <h2>{messages.finalPage.missingTitle}</h2>
+          <ul>
+            {missingItems.map((item) => (
+              <li key={item.fieldPath}>
+                <Link href={`/${locale}/forms/${formId}/${item.pageKey}?applicationId=${applicationId}`}>
+                  {messages.finalPage.missingLinkPrefix} {resolveMessage(messages, item.labelKey)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <div className="wizard-actions">
+        <a className="wizard-button-secondary" href={`/api/public/applications/${applicationId}/pdf?kind=APPLICATION_PDF`}>
+          {messages.finalPage.downloadPdf}
+        </a>
+        <Link className="wizard-button" href={`/${locale}/applications/${applicationId}`}>
+          {messages.finalPage.relogin}
+        </Link>
+      </div>
+    </PortalChrome>
+  );
+}
+
+function resolveMessage(messages: Record<string, unknown>, key: string) {
+  return key.split(".").reduce<unknown>((current, segment) => {
+    if (typeof current !== "object" || current === null) {
+      return key;
+    }
+
+    return (current as Record<string, unknown>)[segment] ?? key;
+  }, messages) as string;
+}

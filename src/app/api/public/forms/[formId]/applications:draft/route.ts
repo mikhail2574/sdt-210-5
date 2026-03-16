@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { proxyPublicApiRequest } from "@/lib/backend/public-api";
+import { getValidationForPage, getNextWizardPageKey } from "@/lib/demo/public-flow";
 import { resolveBackendFormId, resolveLocalRuntimeFormId } from "@/lib/forms/demo-catalog";
 import { createDraft } from "@/lib/forms/store";
 import { getPageSchema } from "@/lib/forms/runtime";
@@ -30,10 +31,42 @@ export async function POST(request: Request, { params }: DraftRouteProps) {
     }
   } catch {}
 
-  const page = getPageSchema(resolveLocalRuntimeFormId(formId), body.pageKey);
+  const localFormId = resolveLocalRuntimeFormId(formId);
+  const page = getPageSchema(localFormId, body.pageKey);
 
   if (!page) {
     return NextResponse.json({ error: "page_not_found" }, { status: 404 });
+  }
+
+  if (body.pageKey !== "antragsdetails") {
+    const pages = {
+      [body.pageKey]: body.data
+    };
+    const validation = getValidationForPage(localFormId, body.pageKey, pages);
+
+    if (validation.hardMissing.length > 0) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "VALIDATION_FAILED",
+            details: validation.hardMissing
+          }
+        },
+        { status: 422 }
+      );
+    }
+
+    const draft = createDraft(localFormId, body.pageKey, body.data);
+
+    return NextResponse.json({
+      applicationId: draft.applicationId,
+      status: "DRAFT",
+      nextPageKey: getNextWizardPageKey(body.pageKey),
+      validation: {
+        hardMissing: validation.hardMissing,
+        softMissing: validation.softMissing
+      }
+    });
   }
 
   const { values, errors } = validateRequiredFields(page, body.data);
@@ -50,13 +83,19 @@ export async function POST(request: Request, { params }: DraftRouteProps) {
     );
   }
 
-  const draft = createDraft(formId, body.pageKey, normalizeValues(values));
-  const softMissing = getSoftMissingFields(page, values).map((field) => field.id);
+  const draft = createDraft(localFormId, body.pageKey, normalizeValues(values));
+  const softMissing = getSoftMissingFields(page, values).map((field) => ({
+    fieldPath: `antragsdetails.${field.id}`,
+    kind: "field",
+    labelKey: field.labelI18nKey,
+    messageKey: "validation.requiredField",
+    pageKey: "antragsdetails"
+  }));
 
   return NextResponse.json({
     applicationId: draft.applicationId,
     status: "DRAFT",
-    nextPageKey: "anschlussort",
+    nextPageKey: getNextWizardPageKey(body.pageKey),
     validation: {
       hardMissing: [],
       softMissing

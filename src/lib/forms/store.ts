@@ -1,49 +1,13 @@
-import { randomUUID } from "node:crypto";
+import { createDemoDraft, getDraft as getDemoDraft, updateDemoDraft } from "@/lib/demo/demo-store";
 
-import type { AntragsdetailsFormValues } from "@/lib/forms/types";
-
-type DraftRecord = {
-  applicationId: string;
-  formId: string;
-  pageKey: string;
-  data: AntragsdetailsFormValues;
-  revision: number;
-};
-
-const drafts = new Map<string, DraftRecord>();
-
-export function createDraft(formId: string, pageKey: string, data: AntragsdetailsFormValues) {
-  const applicationId = randomUUID();
-
-  drafts.set(applicationId, {
-    applicationId,
-    formId,
-    pageKey,
-    data,
-    revision: 1
-  });
-
-  return drafts.get(applicationId)!;
+export function createDraft(formId: string, pageKey: string, data: Record<string, unknown>) {
+  return createDemoDraft(formId, pageKey, data);
 }
 
-export function updateDraft(applicationId: string, pageKey: string, data: AntragsdetailsFormValues) {
-  const current = drafts.get(applicationId);
-
-  if (!current) {
-    return null;
-  }
-
-  const next = {
-    ...current,
-    pageKey,
-    data,
-    revision: current.revision + 1
-  };
-
-  drafts.set(applicationId, next);
-  return next;
+export function updateDraft(applicationId: string, pageKey: string, data: Record<string, unknown>) {
+  return updateDemoDraft(applicationId, pageKey, data);
 }
 
 export function getDraft(applicationId: string) {
-  return drafts.get(applicationId) ?? null;
+  return getDemoDraft(applicationId);
 }

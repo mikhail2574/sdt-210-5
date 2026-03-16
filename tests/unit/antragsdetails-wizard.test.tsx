@@ -111,7 +111,7 @@ describe("AntragsdetailsWizard", () => {
     expect(dialog).toBeInTheDocument();
     expect(within(dialog).getByText("Nachricht")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Überspringen" }));
+    await user.click(screen.getByRole("button", { name: "Jetzt überspringen" }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(

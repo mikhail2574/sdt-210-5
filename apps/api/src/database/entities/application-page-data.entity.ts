@@ -25,7 +25,7 @@ export class ApplicationPageDataEntity {
   softMissingJson!: string[];
 
   @Column({ name: "hard_missing_json", type: "jsonb", default: () => "'[]'" })
-  hardMissingJson!: Array<Record<string, string>>;
+  hardMissingJson!: Array<Record<string, unknown>>;
 
   @Column({ name: "updated_at", type: "timestamp with time zone" })
   updatedAt!: Date;

@@ -2,11 +2,26 @@ import { Injectable } from "@nestjs/common";
 
 import { type Condition, type ConditionGroup, type FieldBlock, type FormPage, type PageValidationResult, type ValidationIssue } from "../form-schema.types";
 
+type PageValidationInspection = {
+  hardIssues: ValidationIssue[];
+  softIssues: ValidationIssue[];
+};
+
 @Injectable()
 export class PageValidationService {
   validatePage(page: FormPage, data: Record<string, unknown>): PageValidationResult {
-    const hardMissing: ValidationIssue[] = [];
-    const softMissing: string[] = [];
+    const inspection = this.inspectPage(page, data);
+
+    return {
+      hardMissing: inspection.hardIssues,
+      softMissing: inspection.softIssues.map((issue) => issue.path),
+      softMissingDetails: inspection.softIssues
+    };
+  }
+
+  inspectPage(page: FormPage, data: Record<string, unknown>): PageValidationInspection {
+    const hardIssues: ValidationIssue[] = [];
+    const softIssues: ValidationIssue[] = [];
 
     for (const section of page.sections) {
       for (const block of section.blocks) {
@@ -21,12 +36,12 @@ export class PageValidationService {
         const value = this.getValue(block, data, page.key);
 
         if (block.requirement === "required" && !this.hasValue(value)) {
-          hardMissing.push({ path: block.bind.path, issue: "required" });
+          hardIssues.push(this.buildIssue(block, "required"));
           continue;
         }
 
         if (block.requirement === "soft_required" && !this.hasValue(value)) {
-          softMissing.push(block.bind.path);
+          softIssues.push(this.buildIssue(block, "soft_required"));
           continue;
         }
 
@@ -34,30 +49,30 @@ export class PageValidationService {
           continue;
         }
 
-        this.validateValue(block, value, hardMissing);
+        this.validateValue(block, value, hardIssues);
       }
     }
 
-    return { hardMissing, softMissing };
+    return { hardIssues, softIssues };
   }
 
   private validateValue(field: FieldBlock, value: unknown, hardMissing: ValidationIssue[]) {
     if (field.fieldType === "checkbox_group") {
       if (!Array.isArray(value)) {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_type" });
+        hardMissing.push(this.buildIssue(field, "invalid_type"));
         return;
       }
 
       if (field.validation?.minItems && value.length < field.validation.minItems) {
-        hardMissing.push({ path: field.bind.path, issue: "min_items" });
+        hardMissing.push(this.buildIssue(field, "min_items"));
       }
 
       if (field.validation?.maxItems && value.length > field.validation.maxItems) {
-        hardMissing.push({ path: field.bind.path, issue: "max_items" });
+        hardMissing.push(this.buildIssue(field, "max_items"));
       }
 
       if (field.options && value.some((item) => typeof item !== "string" || !field.options?.some((option) => option.id === item))) {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_option" });
+        hardMissing.push(this.buildIssue(field, "invalid_option"));
       }
 
       return;
@@ -65,12 +80,12 @@ export class PageValidationService {
 
     if (field.fieldType === "radio_group" || field.fieldType === "select") {
       if (typeof value !== "string") {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_type" });
+        hardMissing.push(this.buildIssue(field, "invalid_type"));
         return;
       }
 
       if (field.options && !field.options.some((option) => option.id === value)) {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_option" });
+        hardMissing.push(this.buildIssue(field, "invalid_option"));
       }
 
       return;
@@ -78,7 +93,7 @@ export class PageValidationService {
 
     if (field.fieldType === "date") {
       if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_date" });
+        hardMissing.push(this.buildIssue(field, "invalid_date"));
       }
 
       return;
@@ -86,12 +101,12 @@ export class PageValidationService {
 
     if (field.fieldType === "textarea" || field.fieldType === "text") {
       if (typeof value !== "string") {
-        hardMissing.push({ path: field.bind.path, issue: "invalid_type" });
+        hardMissing.push(this.buildIssue(field, "invalid_type"));
         return;
       }
 
       if (field.validation?.maxLength && value.length > field.validation.maxLength) {
-        hardMissing.push({ path: field.bind.path, issue: "max_length" });
+        hardMissing.push(this.buildIssue(field, "max_length"));
       }
     }
   }
@@ -164,5 +179,14 @@ export class PageValidationService {
     }
 
     return value !== undefined && value !== null;
+  }
+
+  private buildIssue(field: FieldBlock, issue: string): ValidationIssue {
+    return {
+      path: field.bind.path,
+      issue,
+      labelKey: field.labelI18nKey,
+      kind: "field"
+    };
   }
 }

@@ -1,15 +1,19 @@
 {
   "home": {
-    "title": "Demo de Kundenportal",
-    "description": "Abre la página del asistente antragsdetails con tema, i18n y guardado automático.",
-    "demoLink": "Abrir formulario demo",
-    "softLink": "Abrir variante soft-required"
+    "title": "Kundenportal demo",
+    "description": "Walk through the full public wizard, customer status area and staff backoffice with seeded demo data.",
+    "demoLink": "Open standard form",
+    "softLink": "Open soft-required form",
+    "customerLogin": "Customer login",
+    "backofficeLogin": "Backoffice login",
+    "customerCredentials": "Demo customer credentials",
+    "staffCredentials": "Demo staff credentials"
   },
   "theme": {
-    "logoAlt": "Portal de clientes Stadtwerke"
+    "logoAlt": "Stadtwerke customer portal"
   },
   "language": {
-    "label": "Idioma",
+    "label": "Language",
     "de": "DE",
     "en": "EN",
     "tr": "TR",
@@ -17,110 +21,407 @@
   },
   "forms": {
     "hausanschluss": {
-      "title": "Conexión doméstica",
-      "description": "Introduce los datos principales de la solicitud."
+      "title": "House connection",
+      "description": "Please provide the key application data for the requested utility connection."
     }
   },
   "pages": {
     "antragsdetails": {
-      "title": "Detalles de la solicitud",
-      "info": "Elige los medios, el tipo de solicitud y la fecha deseada. Los campos obligatorios bloquean el siguiente paso."
+      "title": "Application details",
+      "description": "Choose the requested media, request type and your preferred date.",
+      "info": "Required fields block the next step. Soft-required fields trigger a warning modal and can be completed later."
+    },
+    "anschlussort": {
+      "title": "Connection location",
+      "description": "Capture the service location, object type and supporting files.",
+      "info": "If the street address is not known yet, switch to cadastral details instead."
+    },
+    "kontaktdaten": {
+      "title": "Contact data",
+      "description": "Enter applicant details and clarify the technical contact setup.",
+      "info": "Email confirmation is required because later notifications are sent to this address."
+    },
+    "technischeDaten": {
+      "title": "Technical data",
+      "description": "Describe installer availability, requested power and major devices.",
+      "info": "This MVP focuses on the electricity-related subset of the full legacy flow."
+    },
+    "rechtlicheHinweise": {
+      "title": "Legal notices",
+      "description": "Review the consent statements required for submission.",
+      "info": "All consent checkboxes below are blocking requirements."
+    },
+    "uebersicht": {
+      "title": "Review and submit",
+      "description": "Check all captured data, inspect missing soft requirements and submit the application."
+    },
+    "final": {
+      "title": "Submission complete",
+      "description": "Your tracking credentials are ready. You can log back in at any time and continue with missing information."
     }
   },
   "sections": {
     "medium": {
-      "title": "Medios"
+      "title": "Media"
     },
     "antragsart": {
-      "title": "Tipo de solicitud"
+      "title": "Request type"
     },
     "planung": {
-      "title": "Planificación"
+      "title": "Planning"
+    },
+    "address": {
+      "title": "Address"
+    },
+    "object": {
+      "title": "Connection object"
+    },
+    "uploads": {
+      "title": "Site plan and attachments"
+    },
+    "applicant": {
+      "title": "Applicant"
+    },
+    "technicalContact": {
+      "title": "Technical contact"
+    },
+    "energy": {
+      "title": "Energy details"
+    },
+    "consents": {
+      "title": "Required consents"
     }
   },
   "fields": {
     "selectedMedia": {
-      "label": "Medios seleccionados"
+      "label": "Selected media"
     },
     "requestType": {
-      "label": "Tipo de solicitud"
+      "label": "Request type"
     },
     "changeKind": {
-      "label": "Tipo de cambio",
-      "help": "Este campo aparece cuando eliges “Cambio de conexión”."
+      "label": "Change type",
+      "help": "This field becomes visible when you choose “Change connection”."
     },
     "wunschtermin": {
-      "label": "Fecha preferida",
-      "help": "Selecciona una fecha."
+      "label": "Preferred appointment",
+      "help": "Please choose a target date."
     },
     "message": {
-      "label": "Mensaje",
-      "help": "Opcional, máximo 255 caracteres.",
-      "helpWithHint": "Opcional, máximo 255 caracteres. El override del tenant puede cambiar la ayuda o el comportamiento."
+      "label": "Message",
+      "help": "Optional, maximum 255 characters.",
+      "helpWithHint": "Optional, maximum 255 characters. Tenant overrides may change the hint or behavior."
+    },
+    "addressUnknown": {
+      "label": "Street or house number is not known yet",
+      "help": "Switches the form to district and plot based addressing."
+    },
+    "postalCode": {
+      "label": "Postal code"
+    },
+    "city": {
+      "label": "City"
+    },
+    "street": {
+      "label": "Street"
+    },
+    "houseNumber": {
+      "label": "House number"
+    },
+    "district": {
+      "label": "District"
+    },
+    "plot": {
+      "label": "Plot / parcel"
+    },
+    "objectType": {
+      "label": "Object type"
+    },
+    "usageType": {
+      "label": "Usage type",
+      "help": "Optional detail used for internal triage."
+    },
+    "lageplanUploads": {
+      "label": "Site plan uploads",
+      "help": "Upload a site plan, floor plan or similar supporting document. Demo mode stores only file metadata."
+    },
+    "salutation": {
+      "label": "Salutation"
+    },
+    "firstName": {
+      "label": "First name"
+    },
+    "lastName": {
+      "label": "Last name"
+    },
+    "email": {
+      "label": "Email"
+    },
+    "confirmEmail": {
+      "label": "Confirm email"
+    },
+    "phone": {
+      "label": "Phone"
+    },
+    "applicantIsTechnicalContact": {
+      "label": "Applicant is also the technical contact",
+      "help": "If unchecked, a technical contact name becomes soft-required."
+    },
+    "technicalContactName": {
+      "label": "Technical contact name",
+      "help": "Provide the name of the planner, installer or site contact."
+    },
+    "electricianMode": {
+      "label": "Electrician availability"
+    },
+    "connectionPowerKw": {
+      "label": "Requested connection power (kW)",
+      "help": "Enter the planned total power requirement."
+    },
+    "hasWallbox": {
+      "label": "Wallbox planned"
+    },
+    "wallboxCount": {
+      "label": "Number of wallboxes"
+    },
+    "hasPv": {
+      "label": "PV system planned"
+    },
+    "technicalNotes": {
+      "label": "Technical notes",
+      "help": "Use this field for special equipment or clarifications."
+    },
+    "privacyPolicyAccepted": {
+      "label": "I have read the privacy policy.",
+      "help": "The privacy policy explains how application data is stored and processed."
+    },
+    "dataProcessingAccepted": {
+      "label": "I agree to the processing of my application data.",
+      "help": "Required for application handling and follow-up communication."
+    },
+    "emailCommunicationAccepted": {
+      "label": "I agree to receive email communication about this application.",
+      "help": "Email is used for status updates and appointment coordination."
     }
   },
   "media": {
-    "strom": "Electricidad",
+    "strom": "Electricity",
     "gas": "Gas",
-    "wasser": "Agua"
+    "wasser": "Water"
   },
   "requestType": {
-    "new": "Nueva conexión",
-    "change": "Cambio de conexión",
-    "stilllegung": "Desconexión"
+    "new": "New connection",
+    "change": "Change connection",
+    "stilllegung": "Decommissioning"
   },
   "changeKind": {
-    "erweiterung": "Ampliación",
-    "zusammenlegung": "Unificación"
+    "erweiterung": "System expansion",
+    "zusammenlegung": "Merge"
+  },
+  "options": {
+    "objectType": {
+      "gebaeude": "Building",
+      "freiflaeche": "Open area",
+      "sonstiges": "Other"
+    },
+    "usageType": {
+      "einfamilienhaus": "Single-family house",
+      "mehrfamilienhaus": "Multi-family house",
+      "gewerbe": "Commercial"
+    },
+    "salutation": {
+      "frau": "Ms",
+      "herr": "Mr",
+      "divers": "Diverse"
+    },
+    "electricianMode": {
+      "registered": "Registered electrician already selected",
+      "guest": "Installer will be invited later",
+      "unknown": "Installer not known yet"
+    }
   },
   "wizard": {
-    "headerTitle": "Portal de clientes white-label",
-    "next": "Continuar",
-    "nextStepHint": "Ubicación de conexión",
-    "selectPlaceholder": "Selecciona una opción",
-    "requiredBadge": "Obligatorio",
-    "softRequiredBadge": "Se puede omitir",
-    "errorSummaryTitle": "Corrige los campos resaltados.",
-    "errorSummaryDescription": "La página contiene errores de validación.",
+    "headerTitle": "White-label customer portal",
+    "stepperLabel": "Wizard progress",
+    "next": "Next",
+    "back": "Back",
+    "nextStepHint": "Connection location",
+    "selectPlaceholder": "Please select",
+    "requiredBadge": "Required",
+    "softRequiredBadge": "Can be skipped",
+    "errorSummaryTitle": "Please fix the highlighted fields.",
+    "errorSummaryDescription": "The page contains validation errors.",
+    "removeFile": "Remove",
     "softRequired": {
-      "title": "Información soft-required pendiente",
-      "description": "Puedes omitir estos campos ahora, pero el procesamiento seguirá bloqueado hasta completarlos.",
-      "leaveWarning": "Los campos soft-required se pueden omitir.",
-      "fillNow": "Completar ahora",
-      "skip": "Omitir por ahora"
+      "title": "Missing soft-required information",
+      "description": "You can skip these fields now, but processing stays blocked until they are completed.",
+      "leaveWarning": "This soft-required field can be completed later.",
+      "fillNow": "Fill now",
+      "skip": "Skip for now"
     },
-    "saving": "Guardando…",
-    "saveError": "No se pudo guardar. Inténtalo de nuevo.",
-    "saved": "Borrador guardado."
+    "saving": "Saving…",
+    "saveError": "Saving failed. Please try again.",
+    "saved": "Draft saved."
+  },
+  "summary": {
+    "missingTitle": "Outstanding information before processing",
+    "missingHard": "Missing required field: {field}",
+    "missingSoft": "Missing soft-required field: {field}",
+    "missingAttachment": "Missing attachment: {field}",
+    "fieldCount": "{count} fields captured",
+    "edit": "Edit details",
+    "submit": "Submit application",
+    "submitting": "Submitting…",
+    "submitError": "Submission failed. Please try again.",
+    "booleanYes": "Yes",
+    "booleanNo": "No",
+    "emptyValue": "Not provided"
+  },
+  "finalPage": {
+    "trackingCode": "Tracking code",
+    "password": "Password",
+    "missingTitle": "Missing information",
+    "missingLinkPrefix": "Open",
+    "downloadPdf": "Download PDF",
+    "relogin": "Open customer status"
+  },
+  "customerLogin": {
+    "title": "Customer login",
+    "description": "Use the issued tracking code and password to reopen an application.",
+    "trackingCode": "Tracking code",
+    "password": "Password",
+    "submit": "Log in",
+    "loading": "Signing in…",
+    "error": "Login failed. Please check the credentials.",
+    "demoHint": "Demo credentials:",
+    "backHome": "Back to home"
+  },
+  "customerStatus": {
+    "title": "Application status",
+    "description": "Review the current status, timeline and any missing information.",
+    "statusLabel": "Current status",
+    "timelineTitle": "Timeline",
+    "missingTitle": "Missing information",
+    "downloadPdf": "Download PDF",
+    "resume": "Continue application"
+  },
+  "backoffice": {
+    "productLabel": "Internal backoffice",
+    "title": "Applications backoffice",
+    "navLabel": "Backoffice navigation",
+    "nav": {
+      "dashboard": "Dashboard",
+      "applications": "Applications",
+      "invitations": "Invitations",
+      "theme": "Theme",
+      "forms": "Form overrides"
+    },
+    "notifications": "Notifications",
+    "notificationsEmpty": "No unread notifications.",
+    "logout": "Log out",
+    "loginTitle": "Staff login",
+    "loginDescription": "Demo access uses a seeded account and the local Next.js demo API.",
+    "email": "Email",
+    "password": "Password",
+    "loggingIn": "Signing in…",
+    "loginSubmit": "Log in",
+    "loginError": "Login failed. Please check the credentials.",
+    "metrics": {
+      "unread": "Unread applications",
+      "incomplete": "Submitted incomplete",
+      "scheduled": "Scheduled today"
+    },
+    "quickLinks": "Quick links",
+    "quickUnread": "Open unread applications",
+    "quickIncomplete": "Open incomplete submissions",
+    "quickTheme": "Edit tenant theme",
+    "applicationsTitle": "Applications",
+    "applicationsDescription": "Filter by status or unread state and open the detail view for processing.",
+    "exportCsv": "Export CSV",
+    "filters": {
+      "allStatuses": "All statuses",
+      "allReadStates": "All read states",
+      "unreadOnly": "Unread only",
+      "apply": "Apply filters"
+    },
+    "columns": {
+      "createdAt": "Created",
+      "trackingCode": "Tracking code",
+      "form": "Form",
+      "status": "Status",
+      "customer": "Customer summary"
+    },
+    "unreadBadge": "Unread",
+    "downloadPdf": "Download PDF",
+    "openCustomerView": "Open customer view",
+    "statusTitle": "Status overview",
+    "timelineTitle": "Processing timeline",
+    "modifiedFieldsTitle": "Staff-modified fields",
+    "auditTitle": "Audit log",
+    "auditChangedTo": "changed to",
+    "markReadTitle": "Read state",
+    "markRead": "Mark as read",
+    "transitionTitle": "Status transition",
+    "transitionSubmit": "Apply transition",
+    "appointmentTitle": "Schedule appointment",
+    "appointmentSubmit": "Save appointment",
+    "quickEditTitle": "Quick edit mode",
+    "quickEditSubmit": "Save staff edit",
+    "invitationsTitle": "Invitations",
+    "invitationsDescription": "Invite additional staff, installers or admins into the tenant workspace.",
+    "inviteNew": "Invite user",
+    "inviteEmail": "Email",
+    "inviteRole": "Role",
+    "inviteSubmit": "Send invitation",
+    "sentInvitations": "Sent invitations",
+    "themeTitle": "Theme settings",
+    "themeDescription": "Update tenant palette values and typography for the public portal.",
+    "themeEditor": "Theme editor",
+    "themePreview": "Preview",
+    "themePreviewCopy": "This preview reflects the current tenant palette in the public portal shell.",
+    "themePreviewButton": "Preview action",
+    "themePrimary": "Primary color",
+    "themeSecondary": "Secondary color",
+    "themeAccent": "Accent color",
+    "themeFontSize": "Base font size",
+    "themeSubmit": "Save theme",
+    "formsTitle": "Form overrides",
+    "formsDescription": "Edit the tenant override operations used to build the effective form schema.",
+    "overrideJson": "Override operations JSON",
+    "overrideSubmit": "Save override",
+    "actionError": "Action failed. Please try again.",
+    "overrideError": "Invalid JSON. Please provide a valid override array."
+  },
+  "validation": {
+    "requiredField": "{field} is required.",
+    "requiredAttachment": "{field} is required before processing can continue.",
+    "invalidEmail": "Please enter a valid email address.",
+    "invalidNumber": "Please enter a valid positive number."
   },
   "errors": {
     "selectedMedia": {
-      "required": "Selecciona al menos un medio."
+      "required": "Select at least one medium."
     },
     "requestType": {
-      "required": "Selecciona un tipo de solicitud."
+      "required": "Select a request type."
     },
     "changeKind": {
-      "required": "Selecciona el tipo de cambio."
+      "required": "Select the change type."
     },
     "wunschtermin": {
-      "required": "Selecciona una fecha preferida.",
-      "invalid": "Introduce una fecha válida."
+      "required": "Select a preferred appointment.",
+      "invalid": "Enter a valid date."
     },
     "message": {
-      "maxLength": "El mensaje no puede superar los 255 caracteres."
+      "maxLength": "The message must not exceed 255 characters."
+    },
+    "confirmEmail": {
+      "mismatch": "The email confirmation does not match."
     }
   },
   "links": {
-    "privacy": "Política de privacidad",
-    "imprint": "Aviso legal",
-    "accessibility": "Accesibilidad"
-  },
-  "placeholder": {
-    "anschlussort": {
-      "title": "Siguiente paso: ubicación de conexión",
-      "description": "El guardado automático fue correcto. Esta demo se centra solo en la página antragsdetails.",
-      "backLink": "Volver a detalles de la solicitud"
-    }
+    "privacy": "Privacy policy",
+    "imprint": "Imprint",
+    "accessibility": "Accessibility"
   }
 }

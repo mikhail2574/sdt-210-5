@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 
 import { AntragsdetailsWizard } from "@/components/kundenportal/AntragsdetailsWizard";
-import { getBackendFormRuntime } from "@/lib/backend/public-api";
-import { resolveLocalRuntimeFormId } from "@/lib/forms/demo-catalog";
+import { getResolvedFormRuntime } from "@/lib/demo/runtime";
 import { getDraft } from "@/lib/forms/store";
-import { getPageSchema, getFormRuntime } from "@/lib/forms/runtime";
+import { getPageSchema } from "@/lib/forms/runtime";
 import { isLocale, type Locale } from "@/lib/i18n";
 
 type AntragsdetailsRouteProps = {
@@ -25,13 +24,7 @@ export default async function AntragsdetailsRoute({ params, searchParams }: Antr
     notFound();
   }
 
-  let runtime = null;
-
-  try {
-    runtime = await getBackendFormRuntime(formId);
-  } catch {
-    runtime = getFormRuntime(resolveLocalRuntimeFormId(formId));
-  }
+  const runtime = await getResolvedFormRuntime(formId);
 
   const page = runtime.schema.form.pages.find((pageItem) => pageItem.key === "antragsdetails") ?? getPageSchema(formId, "antragsdetails");
 
@@ -45,7 +38,7 @@ export default async function AntragsdetailsRoute({ params, searchParams }: Antr
     <AntragsdetailsWizard
       formId={formId}
       initialApplicationId={applicationId ?? null}
-      initialValues={draft?.data}
+      initialValues={draft?.pageData["antragsdetails"]}
       locale={locale as Locale}
       page={page}
       theme={runtime.theme}
