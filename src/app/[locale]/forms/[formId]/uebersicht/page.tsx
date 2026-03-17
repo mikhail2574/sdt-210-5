@@ -29,8 +29,7 @@ export default async function UebersichtPage({ params, searchParams }: Uebersich
     redirect(`/${locale}/forms/${formId}/antragsdetails`);
   }
 
-  const runtime = await getResolvedFormRuntime(formId);
-  const summary = await getPublicApplicationSummary(applicationId);
+  const [runtime, summary] = await Promise.all([getResolvedFormRuntime(formId), getPublicApplicationSummary(applicationId)]);
 
   if (!summary) {
     notFound();

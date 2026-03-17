@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
 import { LanguageSwitcher } from "@/components/kundenportal/LanguageSwitcher";
@@ -25,28 +25,31 @@ type BackofficeChromeProps = {
 export function BackofficeChrome({ children, currentPath, locale, notifications, unreadCount, userName }: BackofficeChromeProps) {
   const t = useTranslations();
 
-  const navItems = [
-    {
-      href: `/${locale}/backoffice`,
-      key: "backoffice.nav.dashboard"
-    },
-    {
-      href: `/${locale}/backoffice/applications`,
-      key: "backoffice.nav.applications"
-    },
-    {
-      href: `/${locale}/backoffice/admin/invitations`,
-      key: "backoffice.nav.invitations"
-    },
-    {
-      href: `/${locale}/backoffice/admin/theme`,
-      key: "backoffice.nav.theme"
-    },
-    {
-      href: `/${locale}/backoffice/admin/forms`,
-      key: "backoffice.nav.forms"
-    }
-  ];
+  const navItems = useMemo(
+    () => [
+      {
+        href: `/${locale}/backoffice`,
+        key: "backoffice.nav.dashboard"
+      },
+      {
+        href: `/${locale}/backoffice/applications`,
+        key: "backoffice.nav.applications"
+      },
+      {
+        href: `/${locale}/backoffice/admin/invitations`,
+        key: "backoffice.nav.invitations"
+      },
+      {
+        href: `/${locale}/backoffice/admin/theme`,
+        key: "backoffice.nav.theme"
+      },
+      {
+        href: `/${locale}/backoffice/admin/forms`,
+        key: "backoffice.nav.forms"
+      }
+    ],
+    [locale]
+  );
 
   return (
     <main className="backoffice-shell">

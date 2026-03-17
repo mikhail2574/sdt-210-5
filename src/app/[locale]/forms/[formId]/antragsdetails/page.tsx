@@ -24,15 +24,16 @@ export default async function AntragsdetailsRoute({ params, searchParams }: Antr
     notFound();
   }
 
-  const runtime = await getResolvedFormRuntime(formId);
+  const [runtime, draft] = await Promise.all([
+    getResolvedFormRuntime(formId),
+    applicationId ? getDraft(applicationId) : Promise.resolve(null)
+  ]);
 
   const page = runtime.schema.form.pages.find((pageItem) => pageItem.key === "antragsdetails") ?? getPageSchema(formId, "antragsdetails");
 
   if (!page) {
     notFound();
   }
-
-  const draft = applicationId ? await getDraft(applicationId) : null;
 
   return (
     <AntragsdetailsWizard

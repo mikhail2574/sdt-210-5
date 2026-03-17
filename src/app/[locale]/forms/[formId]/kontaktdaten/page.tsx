@@ -25,8 +25,10 @@ export default async function KontaktdatenPage({ params, searchParams }: Kontakt
     notFound();
   }
 
-  const runtime = await getResolvedFormRuntime(formId);
-  const draft = applicationId ? await getDraft(applicationId) : null;
+  const [runtime, draft] = await Promise.all([
+    getResolvedFormRuntime(formId),
+    applicationId ? getDraft(applicationId) : Promise.resolve(null)
+  ]);
 
   return (
     <GenericWizardForm

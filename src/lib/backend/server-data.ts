@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 
 import { BackendApiError, requestBackofficeJson, requestPublicBackendJson } from "@/lib/backend/api-gateway";
@@ -63,7 +64,7 @@ type PublicCustomerApplication = {
   };
 };
 
-type StaffNotification = {
+export type StaffNotification = {
   id: string;
   applicationId: string;
   label: string;
@@ -151,6 +152,13 @@ export type BackofficeFormRecord = {
   titleI18nKey: string;
 };
 
+export type BackofficePageContext = {
+  notifications: StaffNotification[];
+  tenantIds: string[];
+  unreadCount: number;
+  user: StaffUserProfile;
+};
+
 export async function getBackendFormRuntime(formId: string) {
   return requestPublicBackendJson<FormRuntime>(`/forms/${resolveBackendFormId(formId)}`);
 }
@@ -193,7 +201,7 @@ export async function getApplicationDraft(applicationId: string) {
   };
 }
 
-export async function getServerStaffUser() {
+export const getServerStaffUser = cache(async function getServerStaffUser() {
   try {
     return await requestBackofficeJson<StaffUserProfile>("/me");
   } catch (error) {
@@ -203,9 +211,9 @@ export async function getServerStaffUser() {
 
     throw error;
   }
-}
+});
 
-export async function requireServerStaffUser(locale: Locale) {
+export const requireServerStaffUser = cache(async function requireServerStaffUser(locale: Locale) {
   const user = await getServerStaffUser();
 
   if (!user) {
@@ -213,6 +221,19 @@ export async function requireServerStaffUser(locale: Locale) {
   }
 
   return user;
+});
+
+export async function getBackofficePageContext(locale: Locale): Promise<BackofficePageContext> {
+  const user = await requireServerStaffUser(locale);
+  const tenantIds = user.tenants.map((tenant) => tenant.tenantId);
+  const notificationsPayload = await getBackofficeNotificationsForTenants(tenantIds);
+
+  return {
+    notifications: notificationsPayload.items,
+    tenantIds,
+    unreadCount: notificationsPayload.unreadCount,
+    user
+  };
 }
 
 export async function getBackofficeApplications(tenantId: string, filters: Record<string, string | undefined> = {}) {
