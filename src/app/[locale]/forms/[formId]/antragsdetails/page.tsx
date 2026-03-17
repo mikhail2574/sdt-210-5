@@ -32,7 +32,7 @@ export default async function AntragsdetailsRoute({ params, searchParams }: Antr
     notFound();
   }
 
-  const draft = applicationId ? getDraft(applicationId) : null;
+  const draft = applicationId ? await getDraft(applicationId) : null;
 
   return (
     <AntragsdetailsWizard

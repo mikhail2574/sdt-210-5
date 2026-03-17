@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-This repo is a Week 6 "Assemble First" delivery for a Stadtwerke white-label `Kundenportal`. It must prioritize full reachability, persistence, and explainable architecture over polished UI.
+This repo is a Week 6 "Assemble First" delivery for a Stadtwerke white-label `Kundenportal`. It must prioritize full reachability, persistence, backend correctness, and explainable architecture over polished UI.
 
 ## Architecture Rules
 
@@ -10,50 +10,54 @@ This repo is a Week 6 "Assemble First" delivery for a Stadtwerke white-label `Ku
 2. Do not rewrite the app to React Router just to mirror the assignment wording.
 3. Client-side backend calls must go through `src/services/api.ts`.
 4. Authentication helpers must go through `src/services/auth.ts`.
-5. Persistent business logic and storage belong in `src/services/demo-app-service.ts`.
-6. UI components should stay thin and call the async hook `src/hooks/usePortalApp.ts` for backend mutations.
-7. Keep high-level components at a single level of abstraction:
-   - pages assemble sections
+5. The real source of truth is the Nest backend in `apps/api`; do not add new in-process demo persistence for application, auth, backoffice, theme, invitation, or form-override flows.
+6. Next route handlers under `src/app/api` should stay thin and proxy to the backend while handling same-origin cookies for the web app.
+7. UI components should stay thin and call the async hook `src/hooks/usePortalApp.ts` for backend mutations.
+8. Keep high-level components at a single level of abstraction:
+   - pages assemble sections and fetch data
    - components render UI and call hook operations
-   - services own persistence and business logic
+   - backend helpers own transport and request shaping
 
 ## Backend Choice
 
-- Week 6 runtime backend: custom filesystem-backed JSON store
-- Config file: `src/services/custom-backend-config.ts`
-- Data file: `.data/week-06-demo-backend.json`
-- Reason: single-command local startup with real persistence across reloads
-
-The repo also contains `apps/api` as a production-direction NestJS/Postgres foundation. Do not delete it, but prefer the custom backend for the Week 6 assembled demo unless the task explicitly says to move the running app over to Nest.
+- Week 6 runtime backend: `apps/api` NestJS + TypeORM + PostgreSQL
+- Backend gateway helpers: `src/lib/backend/api-gateway.ts`
+- Server-side read helpers: `src/lib/backend/server-data.ts`
+- Browser base-path config: `src/services/api-config.ts`
+- Reason: use normal backend requests and keep credentials and persistence on the backend instead of a fake local store
 
 ## Auth Rules
 
-- Customer auth uses tracking code + password and an HTTP-only cookie.
-- Staff auth uses email + password and an HTTP-only cookie.
+- Customer auth uses tracking code + password and an HTTP-only cookie storing the issued application session.
+- Staff auth uses email + password and an HTTP-only cookie storing the backend bearer token.
 - Protected customer page: `/${locale}/applications/[applicationId]`
 - Protected staff area: all `/${locale}/backoffice/*` pages
 - Keep logout visible on authenticated pages.
+- Server-side staff checks must validate the cookie against the backend `/me` endpoint, not by decoding or mocking local profile data.
 
 ## File Organization
 
 - `src/services/api.ts`: browser-facing API service
 - `src/services/auth.ts`: auth-specific service wrappers
-- `src/services/*-config.ts`: configuration files only
-- `src/services/demo-app-service.ts`: persistent domain logic
+- `src/lib/backend/api-gateway.ts`: low-level backend request/proxy helpers
+- `src/lib/backend/server-data.ts`: server-side data fetching helpers
+- `src/services/ocr-demo-service.ts`: local OCR demo persistence only
 - `src/hooks/usePortalApp.ts`: thin async hook with `loading` and `error`
 - `src/app/[locale]/...`: page routes
 - `src/components/...`: UI only
+- `apps/api/src/modules/public-applications/...`: backend business logic
 
 ## Conventions
 
 - Prefer the simplest possible HTML structure when adding new Week 6 pages.
-- When adding a new persistent feature:
-  1. add or extend a service function in `src/services/demo-app-service.ts`
-  2. expose it through `src/services/api.ts` if it is called from the browser
-  3. wire it through `src/hooks/usePortalApp.ts`
+- When adding a new backend-backed feature:
+  1. add or extend the backend contract in `apps/api`
+  2. expose it through Next route proxies in `src/app/api` if the browser needs same-origin access
+  3. surface browser mutations through `src/services/api.ts` and `src/hooks/usePortalApp.ts`
   4. render it with minimal UI and visible loading/error states
 - Keep data inspectable. JSON dumps are acceptable and preferred for homework-aligned features.
 - Preserve seeded demo credentials unless the user explicitly asks to change them.
+- Do not reintroduce fallback reads or writes to deleted demo services just to make the UI work offline.
 
 ## Verification Expectations
 
@@ -64,4 +68,4 @@ pnpm exec tsc -p tsconfig.json --noEmit
 pnpm run test:unit
 ```
 
-If a change affects persistent storage behavior, confirm that the data still survives a page reload and that the seeded demo routes remain reachable.
+If a change affects backend integration behavior, confirm that the Next proxy route, the server-rendered page, and the client mutation path all still agree on the same backend contract.

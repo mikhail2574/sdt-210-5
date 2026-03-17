@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { createDemoOcrJob, getDemoOcrJobs } from "@/lib/demo/demo-store";
+import { createOcrDemoJob, getOcrDemoJobs } from "@/services/ocr-demo-service";
 
 export async function GET() {
   return NextResponse.json({
-    items: getDemoOcrJobs()
+    items: getOcrDemoJobs()
   });
 }
 
@@ -14,5 +14,5 @@ export async function POST(request: Request) {
     sourceText: string;
   };
 
-  return NextResponse.json(createDemoOcrJob(body.fileName, body.sourceText), { status: 201 });
+  return NextResponse.json(createOcrDemoJob(body.fileName, body.sourceText), { status: 201 });
 }

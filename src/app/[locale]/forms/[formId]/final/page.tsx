@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { FinalCredentialCard } from "@/components/kundenportal/FinalCredentialCard";
 import { PortalChrome } from "@/components/kundenportal/PortalChrome";
-import { getDemoApplicationDetail } from "@/lib/demo/demo-store";
+import { getPublicApplication } from "@/lib/backend/server-data";
 import { getResolvedFormRuntime } from "@/lib/demo/runtime";
+import { resolveRouteFormId } from "@/lib/forms/demo-catalog";
 import { isLocale, getMessages, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -32,9 +34,9 @@ export default async function FinalPage({ params, searchParams }: FinalPageProps
 
   const messages = await getMessages(locale as Locale);
   const runtime = await getResolvedFormRuntime(formId);
-  const application = getDemoApplicationDetail(applicationId);
+  const application = await getPublicApplication(applicationId);
 
-  if (!application || !application.trackingCode || !application.password) {
+  if (!application || !application.trackingCode) {
     notFound();
   }
 
@@ -43,22 +45,14 @@ export default async function FinalPage({ params, searchParams }: FinalPageProps
     ...application.missingSummary.soft,
     ...application.missingSummary.attachments
   ];
+  const routeFormId = resolveRouteFormId(application.formId);
 
   return (
     <PortalChrome currentPageKey="final" locale={locale as Locale} theme={runtime.theme}>
       <h1 className="wizard-page-title">{messages.pages.final.title}</h1>
       <p className="wizard-page-description">{messages.pages.final.description}</p>
 
-      <div className="credential-card">
-        <div>
-          <p>{messages.finalPage.trackingCode}</p>
-          <strong>{application.trackingCode}</strong>
-        </div>
-        <div>
-          <p>{messages.finalPage.password}</p>
-          <strong>{application.password}</strong>
-        </div>
-      </div>
+      <FinalCredentialCard applicationId={applicationId} trackingCode={application.trackingCode} />
 
       {missingItems.length > 0 ? (
         <section className="wizard-summary warning-summary">
@@ -66,7 +60,7 @@ export default async function FinalPage({ params, searchParams }: FinalPageProps
           <ul>
             {missingItems.map((item) => (
               <li key={item.fieldPath}>
-                <Link href={`/${locale}/forms/${formId}/${item.pageKey}?applicationId=${applicationId}`}>
+                <Link href={`/${locale}/forms/${routeFormId}/${item.pageKey}?applicationId=${applicationId}`}>
                   {messages.finalPage.missingLinkPrefix} {resolveMessage(messages, item.labelKey)}
                 </Link>
               </li>

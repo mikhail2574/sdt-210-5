@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
 
-import { markDemoApplicationRead } from "@/lib/demo/demo-store";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
 type MarkReadRouteProps = {
   params: Promise<{
+    tenantId: string;
     applicationId: string;
   }>;
 };
 
 export async function POST(_: Request, { params }: MarkReadRouteProps) {
-  const { applicationId } = await params;
-  const updated = markDemoApplicationRead(applicationId);
-
-  if (!updated) {
-    return NextResponse.json({ error: "application_not_found" }, { status: 404 });
-  }
-
-  return NextResponse.json({ ok: true, applicationId });
+  const { tenantId, applicationId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/applications/${applicationId}/mark-read`, {
+    method: "POST"
+  });
 }

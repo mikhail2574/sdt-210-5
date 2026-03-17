@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { listDemoApplications, listDemoNotifications } from "@/lib/demo/demo-store";
-import { requireServerStaffUser } from "@/lib/demo/server-auth";
+import { getBackofficeApplications, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -28,23 +27,22 @@ export default async function ApplicationsListPage({ params, searchParams }: App
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
-  const notifications = listDemoNotifications();
-  let applications = listDemoApplications();
-
-  if (filters.status) {
-    applications = applications.filter((item) => item.status === filters.status);
-  }
-
-  if (filters.unread === "true") {
-    applications = applications.filter((item) => item.unreadByStaff);
-  }
+  const [notificationsPayload, applicationsPayload] = await Promise.all([
+    getBackofficeNotifications(user.tenantId),
+    getBackofficeApplications(user.tenantId, {
+      status: filters.status,
+      unread: filters.unread
+    })
+  ]);
+  const notifications = notificationsPayload.items;
+  const applications = applicationsPayload.items;
 
   return (
     <BackofficeChrome
       currentPath={`/${locale}/backoffice/applications`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notifications.length}
+      unreadCount={notificationsPayload.unreadCount}
       userName={user.displayName}
     >
       <div className="panel-header">
@@ -52,7 +50,7 @@ export default async function ApplicationsListPage({ params, searchParams }: App
           <h2>{messages.backoffice.applicationsTitle}</h2>
           <p>{messages.backoffice.applicationsDescription}</p>
         </div>
-        <a className="secondary-button" href="/api/tenants/tenant-demo/exports/applications.csv">
+        <a className="secondary-button" href={`/api/tenants/${user.tenantId}/exports/applications.csv`}>
           {messages.backoffice.exportCsv}
         </a>
       </div>

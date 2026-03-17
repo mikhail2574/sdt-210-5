@@ -317,6 +317,7 @@
   "finalPage": {
     "trackingCode": "Tracking code",
     "password": "Password",
+    "passwordUnavailable": "Only available from the original submit response on this device",
     "missingTitle": "Missing information",
     "missingLinkPrefix": "Open",
     "downloadPdf": "Download PDF",

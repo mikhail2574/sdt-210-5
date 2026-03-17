@@ -87,6 +87,51 @@ describe("frontend API client", () => {
     expect(result.nextPageKey).toBe("anschlussort");
   });
 
+  it("recovers from a stale persisted application id by creating a fresh draft", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(
+          {
+            error: "application_not_found"
+          },
+          404
+        )
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          applicationId: "app-recreated",
+          nextPageKey: "anschlussort"
+        })
+      );
+    const api = createBrowserFrontendApi(fetchMock);
+
+    const result = await api.publicApplications.savePage({
+      applicationId: "stale-app-id",
+      formId: "hausanschluss-soft-demo",
+      pageKey: "antragsdetails",
+      data: {
+        selectedMedia: ["strom"]
+      }
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "/api/public/applications/stale-app-id/pages/antragsdetails",
+      expect.objectContaining({
+        method: "PUT"
+      })
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/public/forms/hausanschluss-soft-demo/applications:draft",
+      expect.objectContaining({
+        method: "POST"
+      })
+    );
+    expect(result.applicationId).toBe("app-recreated");
+  });
+
   it("surfaces validation failures as typed API errors", async () => {
     const payload: ValidationErrorPayload = {
       error: {

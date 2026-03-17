@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 
-import { buildApplicationsCsv } from "@/lib/demo/downloads";
+import { proxyBackofficeBinary } from "@/lib/backend/api-gateway";
 import { getServerStaffUser } from "@/lib/demo/server-auth";
 
-export async function GET() {
+type ExportCsvRouteProps = {
+  params: Promise<{
+    tenantId: string;
+  }>;
+};
+
+export async function GET(_: Request, { params }: ExportCsvRouteProps) {
+  const { tenantId } = await params;
   const user = await getServerStaffUser();
 
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  return new NextResponse(buildApplicationsCsv(), {
-    headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="applications.csv"'
-    }
-  });
+  return proxyBackofficeBinary(`/tenants/${tenantId}/exports/applications.csv`);
 }

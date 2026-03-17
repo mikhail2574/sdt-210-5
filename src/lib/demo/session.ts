@@ -1,2 +1,2 @@
-export const customerSessionCookieName = "demo-customer-application-id";
-export const staffSessionCookieName = "demo-backoffice-access-token";
+export const customerSessionCookieName = "customer-application-id";
+export const staffSessionCookieName = "backoffice-access-token";

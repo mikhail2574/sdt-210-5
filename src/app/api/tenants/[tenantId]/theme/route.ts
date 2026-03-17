@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
 
-import { getDemoTenantTheme, updateDemoTenantTheme } from "@/lib/demo/demo-store";
-import type { ThemeConfig } from "@/lib/forms/types";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
-export async function GET() {
-  return NextResponse.json(getDemoTenantTheme());
+type ThemeRouteProps = {
+  params: Promise<{
+    tenantId: string;
+  }>;
+};
+
+export async function GET(_: Request, { params }: ThemeRouteProps) {
+  const { tenantId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/theme`);
 }
 
-export async function PUT(request: Request) {
-  const body = (await request.json()) as ThemeConfig;
-  return NextResponse.json(updateDemoTenantTheme(body));
+export async function PUT(request: Request, { params }: ThemeRouteProps) {
+  const { tenantId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/theme`, {
+    method: "PUT",
+    body: await request.text()
+  });
 }

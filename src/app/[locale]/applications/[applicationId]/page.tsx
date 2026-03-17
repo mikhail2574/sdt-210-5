@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 
 import { CustomerLogoutButton } from "@/components/kundenportal/CustomerLogoutButton";
 import { PortalChrome } from "@/components/kundenportal/PortalChrome";
-import { getDemoCustomerApplication } from "@/lib/demo/demo-store";
+import { getPublicApplication } from "@/lib/backend/server-data";
 import { getResolvedFormRuntime } from "@/lib/demo/runtime";
 import { requireServerCustomerApplicationId } from "@/lib/demo/server-auth";
+import { resolveRouteFormId } from "@/lib/forms/demo-catalog";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +27,13 @@ export default async function CustomerApplicationPage({ params }: CustomerApplic
 
   const messages = await getMessages(locale as Locale);
   await requireServerCustomerApplicationId(locale as Locale, applicationId);
-  const application = getDemoCustomerApplication(applicationId);
+  const application = await getPublicApplication(applicationId);
 
   if (!application) {
     notFound();
   }
 
+  const routeFormId = resolveRouteFormId(application.formId);
   const runtime = await getResolvedFormRuntime(application.formId);
   const resumePageKey =
     application.missingSummary.hard[0]?.pageKey ??
@@ -86,7 +88,7 @@ export default async function CustomerApplicationPage({ params }: CustomerApplic
         <a className="wizard-button-secondary" href={`/api/public/applications/${applicationId}/pdf?kind=APPLICATION_PDF`}>
           {messages.customerStatus.downloadPdf}
         </a>
-        <Link className="wizard-button" href={`/${locale}/forms/${application.formId}/${resumePageKey}?applicationId=${applicationId}`}>
+        <Link className="wizard-button" href={`/${locale}/forms/${routeFormId}/${resumePageKey}?applicationId=${applicationId}`}>
           {messages.customerStatus.resume}
         </Link>
         <CustomerLogoutButton locale={locale as Locale} />

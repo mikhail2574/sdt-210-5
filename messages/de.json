@@ -317,6 +317,7 @@
   "finalPage": {
     "trackingCode": "Tracking-Code",
     "password": "Passwort",
+    "passwordUnavailable": "Nur auf diesem Geraet aus der urspruenglichen Sendeantwort verfuegbar",
     "missingTitle": "Fehlende Informationen",
     "missingLinkPrefix": "Anzeigen",
     "downloadPdf": "PDF herunterladen",

@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { listDemoApplications, listDemoNotifications } from "@/lib/demo/demo-store";
-import { requireServerStaffUser } from "@/lib/demo/server-auth";
+import { getBackofficeApplications, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +22,12 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
-  const applications = listDemoApplications();
-  const notifications = listDemoNotifications();
+  const [applicationsPayload, notificationsPayload] = await Promise.all([
+    getBackofficeApplications(user.tenantId),
+    getBackofficeNotifications(user.tenantId)
+  ]);
+  const applications = applicationsPayload.items;
+  const notifications = notificationsPayload.items;
   const unreadCount = applications.filter((item) => item.unreadByStaff).length;
   const submittedIncompleteCount = applications.filter((item) => item.status === "SUBMITTED_INCOMPLETE").length;
   const scheduledCount = applications.filter((item) => item.status === "SCHEDULED").length;
@@ -34,7 +37,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       currentPath={`/${locale}/backoffice`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notifications.length}
+      unreadCount={notificationsPayload.unreadCount}
       userName={user.displayName}
     >
       <div className="dashboard-grid">

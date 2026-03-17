@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { listDemoForms } from "@/lib/demo/demo-store";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
-export async function GET() {
-  return NextResponse.json({
-    items: listDemoForms()
-  });
+type FormsRouteProps = {
+  params: Promise<{
+    tenantId: string;
+  }>;
+};
+
+export async function GET(_: Request, { params }: FormsRouteProps) {
+  const { tenantId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/forms`);
 }

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import { SummaryStep } from "@/components/kundenportal/SummaryStep";
-import { getDemoApplicationSummary } from "@/lib/demo/demo-store";
+import { getPublicApplicationSummary } from "@/lib/backend/server-data";
 import { getResolvedFormRuntime } from "@/lib/demo/runtime";
 import { isLocale, type Locale } from "@/lib/i18n";
 
@@ -30,7 +30,7 @@ export default async function UebersichtPage({ params, searchParams }: Uebersich
   }
 
   const runtime = await getResolvedFormRuntime(formId);
-  const summary = getDemoApplicationSummary(applicationId);
+  const summary = await getPublicApplicationSummary(applicationId);
 
   if (!summary) {
     notFound();

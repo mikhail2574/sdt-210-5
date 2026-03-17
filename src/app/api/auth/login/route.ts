@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { loginDemoStaff } from "@/lib/demo/demo-store";
+import { requestBackendJson } from "@/lib/backend/api-gateway";
 import { staffSessionCookieName } from "@/lib/demo/session";
 
 export async function POST(request: Request) {
@@ -8,27 +8,43 @@ export async function POST(request: Request) {
     email: string;
     password: string;
   };
-  const session = loginDemoStaff(body.email, body.password);
+  try {
+    const session = await requestBackendJson<{
+      accessToken: string;
+      tenantId: string;
+      user: {
+        id: string;
+        email: string;
+        displayName: string;
+        role: string;
+        tenantId: string;
+      };
+    }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
 
-  if (!session) {
-    return NextResponse.json(
-      {
+    const response = NextResponse.json(session);
+    response.cookies.set(staffSessionCookieName, session.accessToken, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 8
+    });
+
+    return response;
+  } catch (error) {
+    if (error instanceof Error && "status" in error) {
+      const status = Number((error as { status?: number }).status ?? 500);
+      const payload = (error as { payload?: unknown }).payload ?? {
         error: {
           code: "UNAUTHORIZED",
           message: "Invalid email or password."
         }
-      },
-      { status: 401 }
-    );
+      };
+      return NextResponse.json(payload, { status });
+    }
+
+    throw error;
   }
-
-  const response = NextResponse.json(session);
-  response.cookies.set(staffSessionCookieName, session.accessToken, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 8
-  });
-
-  return response;
 }

@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 
-import { listDemoAuditEntries } from "@/lib/demo/demo-store";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
 type AuditRouteProps = {
   params: Promise<{
+    tenantId: string;
     applicationId: string;
   }>;
 };
 
 export async function GET(_: Request, { params }: AuditRouteProps) {
-  const { applicationId } = await params;
-  return NextResponse.json({
-    items: listDemoAuditEntries(applicationId)
-  });
+  const { tenantId, applicationId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/applications/${applicationId}/audit`);
 }

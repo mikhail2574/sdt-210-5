@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
 import { ThemeEditorForm } from "@/components/backoffice/ThemeEditorForm";
-import { getDemoTenantTheme, listDemoNotifications } from "@/lib/demo/demo-store";
-import { requireServerStaffUser } from "@/lib/demo/server-auth";
+import { getBackofficeNotifications, getBackofficeTheme, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -23,15 +22,18 @@ export default async function ThemeAdminPage({ params }: ThemeAdminPageProps) {
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
-  const notifications = listDemoNotifications();
-  const theme = getDemoTenantTheme();
+  const [notificationsPayload, theme] = await Promise.all([
+    getBackofficeNotifications(user.tenantId),
+    getBackofficeTheme(user.tenantId)
+  ]);
+  const notifications = notificationsPayload.items;
 
   return (
     <BackofficeChrome
       currentPath={`/${locale}/backoffice/admin/theme`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notifications.length}
+      unreadCount={notificationsPayload.unreadCount}
       userName={user.displayName}
     >
       <div className="panel-header">

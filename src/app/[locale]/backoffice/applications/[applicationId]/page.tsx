@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ApplicationActions } from "@/components/backoffice/ApplicationActions";
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { getDemoApplicationDetail, listDemoNotifications } from "@/lib/demo/demo-store";
-import { requireServerStaffUser } from "@/lib/demo/server-auth";
+import { getBackofficeApplicationDetail, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +24,11 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
-  const notifications = listDemoNotifications();
-  const application = getDemoApplicationDetail(applicationId);
+  const [notificationsPayload, application] = await Promise.all([
+    getBackofficeNotifications(user.tenantId),
+    getBackofficeApplicationDetail(user.tenantId, applicationId)
+  ]);
+  const notifications = notificationsPayload.items;
 
   if (!application) {
     notFound();
@@ -45,7 +47,7 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
       currentPath={`/${locale}/backoffice/applications`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notifications.length}
+      unreadCount={notificationsPayload.unreadCount}
       userName={user.displayName}
     >
       <div className="panel-header">

@@ -5,8 +5,7 @@ import {
   type FormRuntime,
   type FormSchema
 } from "@/lib/forms/types";
-import { getDemoFormOverride, getDemoTenantTheme } from "@/lib/demo/demo-store";
-import { baseSchema, defaultOverridesByFormId } from "@/lib/forms/runtime-data";
+import { baseSchema, baseTheme, defaultOverridesByFormId } from "@/lib/forms/runtime-data";
 
 function cloneSchema(schema: FormSchema): FormSchema {
   return JSON.parse(JSON.stringify(schema)) as FormSchema;
@@ -53,12 +52,12 @@ export function applyOverrides(schema: FormSchema, operations: FormOverrideOpera
 }
 
 export function getFormRuntime(formId: string): FormRuntime {
-  const overrides = getDemoFormOverride(formId) ?? defaultOverridesByFormId[formId] ?? defaultOverridesByFormId["hausanschluss-demo"];
+  const overrides = defaultOverridesByFormId[formId] ?? defaultOverridesByFormId["hausanschluss-demo"];
 
   return {
     formId,
-    tenantId: "tenant-demo",
-    theme: getDemoTenantTheme(),
+    tenantId: "local-form-preview",
+    theme: baseTheme,
     schema: applyOverrides(baseSchema, overrides)
   };
 }

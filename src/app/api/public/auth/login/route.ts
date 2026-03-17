@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { loginDemoCustomer } from "@/lib/demo/demo-store";
+import { requestPublicBackendJson } from "@/lib/backend/api-gateway";
 import { customerSessionCookieName } from "@/lib/demo/session";
 
 export async function POST(request: Request) {
@@ -8,27 +8,37 @@ export async function POST(request: Request) {
     trackingCode: string;
     password: string;
   };
-  const result = loginDemoCustomer(body.trackingCode, body.password);
+  try {
+    const result = await requestPublicBackendJson<{
+      applicationId: string;
+      status: string;
+      expiresInSeconds: number;
+    }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
 
-  if (!result) {
-    return NextResponse.json(
-      {
+    const response = NextResponse.json(result);
+    response.cookies.set(customerSessionCookieName, result.applicationId, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: result.expiresInSeconds
+    });
+
+    return response;
+  } catch (error) {
+    if (error instanceof Error && "status" in error) {
+      const status = Number((error as { status?: number }).status ?? 500);
+      const payload = (error as { payload?: unknown }).payload ?? {
         error: {
           code: "UNAUTHORIZED",
           message: "Invalid tracking code or password."
         }
-      },
-      { status: 401 }
-    );
+      };
+      return NextResponse.json(payload, { status });
+    }
+
+    throw error;
   }
-
-  const response = NextResponse.json(result);
-  response.cookies.set(customerSessionCookieName, result.applicationId, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax",
-    maxAge: result.expiresInSeconds
-  });
-
-  return response;
 }

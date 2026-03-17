@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 
-import { listDemoApplications } from "@/lib/demo/demo-store";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
-export async function GET() {
-  const items = listDemoApplications();
-  return NextResponse.json({
-    items,
-    page: 1,
-    pageSize: items.length,
-    total: items.length
-  });
+type ApplicationsRouteProps = {
+  params: Promise<{
+    tenantId: string;
+  }>;
+};
+
+export async function GET(request: Request, { params }: ApplicationsRouteProps) {
+  const { tenantId } = await params;
+  const search = new URL(request.url).search;
+  return proxyBackofficeJson(`/tenants/${tenantId}/applications${search}`);
 }

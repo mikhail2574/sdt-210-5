@@ -33,9 +33,9 @@ export default async function AboutPage({ params }: AboutPageProps) {
           {JSON.stringify(
             {
               frontend: "Next.js App Router + React + Zustand + react-hook-form",
-              backend: "Custom Node/Next route handlers with filesystem-backed JSON persistence",
-              auth: "Cookie-based customer and staff sessions",
-              services: ["src/services/api.ts", "src/services/auth.ts", "src/services/demo-app-service.ts"]
+              backend: "NestJS + TypeORM + PostgreSQL, proxied through Next.js route handlers",
+              auth: "Cookie-backed staff and customer sessions bridged to backend tokens and application access",
+              services: ["src/services/api.ts", "src/services/auth.ts", "apps/api/src/modules/public-applications/services/*"]
             },
             null,
             2

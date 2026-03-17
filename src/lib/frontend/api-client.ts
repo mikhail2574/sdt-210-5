@@ -128,7 +128,7 @@ export function createBrowserFrontendApi(fetchImpl: FetchLike = defaultFetch): F
     },
     publicApplications: {
       async savePage(input) {
-        if (!input.applicationId) {
+        async function createDraftFromCurrentPage() {
           const payload = await requestJson<SavePageRouteResponse, ValidationErrorPayload>(
             fetchImpl,
             `/api/public/forms/${input.formId}/applications:draft`,
@@ -141,16 +141,28 @@ export function createBrowserFrontendApi(fetchImpl: FetchLike = defaultFetch): F
           return normalizeSavePageResponse(payload);
         }
 
-        const payload = await requestJson<SavePageRouteResponse, ValidationErrorPayload>(
-          fetchImpl,
-          `/api/public/applications/${input.applicationId}/pages/${input.pageKey}`,
-          createJsonRequestInit("PUT", {
-            data: input.data,
-            clientRevision: input.clientRevision ?? Date.now()
-          })
-        );
+        if (!input.applicationId) {
+          return createDraftFromCurrentPage();
+        }
 
-        return normalizeSavePageResponse(payload, input.applicationId);
+        try {
+          const payload = await requestJson<SavePageRouteResponse, ValidationErrorPayload>(
+            fetchImpl,
+            `/api/public/applications/${input.applicationId}/pages/${input.pageKey}`,
+            createJsonRequestInit("PUT", {
+              data: input.data,
+              clientRevision: input.clientRevision ?? Date.now()
+            })
+          );
+
+          return normalizeSavePageResponse(payload, input.applicationId);
+        } catch (error) {
+          if (isFrontendApiError(error) && error.status === 404) {
+            return createDraftFromCurrentPage();
+          }
+
+          throw error;
+        }
       },
       async submitApplication(applicationId, input) {
         const payload = await requestJson<SubmitApplicationRouteResponse>(

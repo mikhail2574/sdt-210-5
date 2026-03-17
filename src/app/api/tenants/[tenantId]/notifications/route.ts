@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { listDemoNotifications } from "@/lib/demo/demo-store";
+import { proxyBackofficeJson } from "@/lib/backend/api-gateway";
 
-export async function GET() {
-  const items = listDemoNotifications();
+type NotificationsRouteProps = {
+  params: Promise<{
+    tenantId: string;
+  }>;
+};
 
-  return NextResponse.json({
-    unreadCount: items.length,
-    items
-  });
+export async function GET(_: Request, { params }: NotificationsRouteProps) {
+  const { tenantId } = await params;
+  return proxyBackofficeJson(`/tenants/${tenantId}/notifications`);
 }

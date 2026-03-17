@@ -12,7 +12,7 @@ export function resolveBackendFormId(formId: string) {
   return demoPublicFormIds[formId as keyof typeof demoPublicFormIds] ?? formId;
 }
 
-export function resolveLocalRuntimeFormId(formId: string) {
+export function resolveRouteFormId(formId: string) {
   if (formId in demoPublicFormIds) {
     return formId;
   }
@@ -20,3 +20,5 @@ export function resolveLocalRuntimeFormId(formId: string) {
   const reverseEntry = Object.entries(demoPublicFormIds).find(([, publicFormId]) => publicFormId === formId);
   return reverseEntry?.[0] ?? demoRouteFormIds.demo;
 }
+
+export const resolveLocalRuntimeFormId = resolveRouteFormId;

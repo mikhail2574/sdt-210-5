@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { submitDemoApplication } from "@/lib/demo/demo-store";
+import { proxyPublicBackendJson } from "@/lib/backend/api-gateway";
 
 type SubmitRouteProps = {
   params: Promise<{
@@ -10,14 +10,8 @@ type SubmitRouteProps = {
 
 export async function POST(request: Request, { params }: SubmitRouteProps) {
   const { applicationId } = await params;
-  const body = (await request.json()) as {
-    consents: Record<string, unknown>;
-  };
-  const result = submitDemoApplication(applicationId, body.consents);
-
-  if (!result) {
-    return NextResponse.json({ error: "application_not_found" }, { status: 404 });
-  }
-
-  return NextResponse.json(result);
+  return proxyPublicBackendJson(`/applications/${applicationId}/submit`, {
+    method: "POST",
+    body: await request.text()
+  });
 }

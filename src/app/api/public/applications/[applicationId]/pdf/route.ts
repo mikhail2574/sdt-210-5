@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { buildApplicationDownload } from "@/lib/demo/downloads";
+import { proxyPublicBackendBinary } from "@/lib/backend/api-gateway";
 import { getServerCustomerApplicationId } from "@/lib/demo/server-auth";
 
 type PdfRouteProps = {
@@ -17,16 +17,5 @@ export async function GET(_: Request, { params }: PdfRouteProps) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const content = buildApplicationDownload(applicationId);
-
-  if (!content) {
-    return NextResponse.json({ error: "application_not_found" }, { status: 404 });
-  }
-
-  return new NextResponse(content, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${applicationId}.pdf"`
-    }
-  });
+  return proxyPublicBackendBinary(`/applications/${applicationId}/pdf`);
 }

@@ -1,14 +1,18 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { getDemoProfile } from "@/lib/demo/demo-store";
+import { getServerStaffUser as getBackendStaffUser } from "@/lib/backend/server-data";
 import { customerSessionCookieName, staffSessionCookieName } from "@/lib/demo/session";
 import type { Locale } from "@/lib/i18n";
 
 export async function getServerStaffUser() {
   const cookieStore = await cookies();
-  const token = cookieStore.get(staffSessionCookieName)?.value ?? "";
-  return getDemoProfile(token);
+
+  if (!cookieStore.get(staffSessionCookieName)?.value) {
+    return null;
+  }
+
+  return getBackendStaffUser();
 }
 
 export async function requireServerStaffUser(locale: Locale) {
