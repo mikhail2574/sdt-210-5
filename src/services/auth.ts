@@ -1,4 +1,4 @@
-import type { CustomerLoginInput, StaffLoginInput } from "@/lib/frontend/api-contract";
+import type { AcceptInvitationInput, CustomerLoginInput, StaffLoginInput } from "@/lib/frontend/api-contract";
 import { appApi } from "@/services/api";
 
 export const authService = {
@@ -10,6 +10,9 @@ export const authService = {
   },
   signInStaff(input: StaffLoginInput) {
     return appApi.staffAuth.login(input);
+  },
+  acceptInvitation(inviteId: string, input: AcceptInvitationInput) {
+    return appApi.staffAuth.acceptInvitation(inviteId, input);
   },
   signOutStaff() {
     return appApi.staffAuth.logout();

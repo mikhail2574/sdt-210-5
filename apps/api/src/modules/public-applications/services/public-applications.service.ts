@@ -15,6 +15,7 @@ import { type PresignAttachmentDto } from "../dto/presign-attachment.dto";
 import { type SubmitApplicationDto } from "../dto/submit-application.dto";
 import { type UpdatePageDto } from "../dto/update-page.dto";
 import { ApplicationViewService } from "./application-view.service";
+import { buildApplicationPdfBuffer } from "./application-pdf-builder";
 import { AuthService } from "./auth.service";
 import { EffectiveFormService } from "./effective-form.service";
 import { PageValidationService } from "./page-validation.service";
@@ -309,9 +310,36 @@ export class PublicApplicationsService {
 
   async getApplicationPdf(applicationId: string) {
     const application = await this.loadApplication(applicationId);
-    const customerSummary = this.applicationViewService.buildCustomerSummary(application.pageData);
-    const content = `Application ${application.publicTrackingCode ?? application.id}\nStatus: ${application.status}\nCustomer: ${customerSummary.name}\nAddress: ${customerSummary.address}`;
-    return this.buildPdfBuffer(content);
+    const [{ effectiveSchema }, tenant, attachments, appointment] = await Promise.all([
+      this.effectiveFormService.resolveByApplication(application),
+      this.tenantRepository.findOne({
+        where: { id: application.tenantId }
+      }),
+      this.attachmentRepository.find({
+        where: { applicationId },
+        order: { uploadedAt: "ASC" }
+      }),
+      this.appointmentRepository.findOne({
+        where: { applicationId },
+        order: { createdAt: "DESC" }
+      })
+    ]);
+
+    if (!tenant) {
+      throw new ApiResourceNotFoundException("Tenant not found");
+    }
+
+    const summary = this.applicationViewService.buildSummary(effectiveSchema, application.pageData);
+
+    return buildApplicationPdfBuffer({
+      application,
+      attachments,
+      appointment,
+      missingSummary: summary.missingSummary,
+      pageData: application.pageData,
+      schema: effectiveSchema,
+      tenantName: tenant.name
+    });
   }
 
   private resolveTheme(tenant: TenantEntity): ThemeConfig {
@@ -415,35 +443,5 @@ export class PublicApplicationsService {
 
   private generateCustomerPassword() {
     return `Demo${randomUUID().slice(0, 8)}!`;
-  }
-
-  private buildPdfBuffer(text: string) {
-    const safeText = text.replace(/[()\\]/g, "");
-    const stream = `BT /F1 12 Tf 40 760 Td (${safeText}) Tj ET`;
-    const objects = [
-      "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
-      "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
-      "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n",
-      "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
-      `5 0 obj\n<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream\nendobj\n`
-    ];
-
-    let pdf = "%PDF-1.4\n";
-    const offsets = [0];
-
-    for (const object of objects) {
-      offsets.push(Buffer.byteLength(pdf));
-      pdf += object;
-    }
-
-    const startXref = Buffer.byteLength(pdf);
-    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-
-    for (let index = 1; index < offsets.length; index += 1) {
-      pdf += `${String(offsets[index]).padStart(10, "0")} 00000 n \n`;
-    }
-
-    pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${startXref}\n%%EOF`;
-    return Buffer.from(pdf, "utf8");
   }
 }

@@ -36,6 +36,7 @@ Rationale: it satisfies the assignment requirement for normal backend requests, 
 - Server-side reads go through [src/lib/backend/server-data.ts](./src/lib/backend/server-data.ts)
 - Low-level backend request helpers live in [src/lib/backend/api-gateway.ts](./src/lib/backend/api-gateway.ts)
 - Async UI actions use the thin hook [src/hooks/usePortalApp.ts](./src/hooks/usePortalApp.ts), which exposes `loading` and `error`
+- Reusable frontend UI primitives now start in [src/components/atoms](./src/components/atoms) and [src/components/molecules](./src/components/molecules), while route-facing feature components stay under [src/components/backoffice](./src/components/backoffice) and [src/components/kundenportal](./src/components/kundenportal)
 - OCR demo persistence is isolated in [src/services/ocr-demo-service.ts](./src/services/ocr-demo-service.ts)
 
 ### Feature Verification Table
@@ -50,6 +51,7 @@ Rationale: it satisfies the assignment requirement for normal backend requests, 
 | Protected customer status page | `/${locale}/applications/[applicationId]` | Cookie session + backend application data | Done |
 | Customer logout | Customer status page | Cookie cleared | Done |
 | Backoffice login/logout | `/${locale}/backoffice/login` and backoffice shell | Backend auth + cookie session | Done |
+| Staff invitation acceptance | `/${locale}/invitations/[inviteId]` | Backend invite accept flow + cookie session | Done |
 | Protected backoffice routes | `/${locale}/backoffice/*` | Cookie session + backend `/me` validation | Done |
 | Dashboard | `/${locale}/backoffice` | Backend application data | Done |
 | Applications list + filters | `/${locale}/backoffice/applications` | Backend application data | Done |
@@ -73,21 +75,38 @@ Rationale: it satisfies the assignment requirement for normal backend requests, 
 pnpm install
 ```
 
-2. Start PostgreSQL and make sure the backend database is reachable with the `API_DB_*` environment variables used in `apps/api/src/database/typeorm.config.ts`.
+2. Copy `.env.example` to your local env file and fill in the values you need.
 
-3. Start the backend:
+3. Start PostgreSQL and make sure the backend database is reachable with the `API_DB_*` environment variables used in `apps/api/src/database/typeorm.config.ts`.
 
-```bash
-pnpm run api:dev
-```
-
-4. Start the frontend:
+4. Start the full app:
 
 ```bash
 pnpm dev
 ```
 
 5. Open `http://localhost:3000/de`
+
+### Gmail Invitation Email Setup
+
+The backoffice invitation flow now sends a real email and links to the invite-accept page that creates the staff user account.
+
+Required env values:
+
+- `FRONTEND_APP_URL`: public web URL used inside invitation links, for example `http://localhost:3000`
+- `SMTP_USER`: your Gmail address
+- `SMTP_PASSWORD`: a Google App Password for that Gmail account
+- `SMTP_FROM_EMAIL`: sender email, usually the same Gmail address
+- `SMTP_FROM_NAME`: sender label shown in the email
+- `INVITATION_LOCALE`: locale used in the invite URL, for example `de`
+
+Recommended Gmail settings for this project:
+
+- `SMTP_HOST=smtp.gmail.com`
+- `SMTP_PORT=465`
+- `SMTP_SECURE=true`
+
+If you want to work locally without sending mail, set `API_DISABLE_EMAIL_DELIVERY=1`.
 
 ### Useful Commands
 

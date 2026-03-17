@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import type {
+  AcceptInvitationInput,
   CustomerLoginInput,
   InviteUserInput,
   SavePublicApplicationPageInput,
@@ -33,7 +34,7 @@ export function usePortalApp() {
     try {
       return await action();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "unknown_error");
+      setError(resolveActionError(caughtError));
       throw caughtError;
     } finally {
       setLoading(false);
@@ -55,6 +56,13 @@ export function usePortalApp() {
     staffLogin(input: StaffLoginInput) {
       return runAction(async () => {
         const session = await authService.signInStaff(input);
+        setBackofficeSession(session);
+        return session;
+      });
+    },
+    acceptInvitation(inviteId: string, input: AcceptInvitationInput) {
+      return runAction(async () => {
+        const session = await authService.acceptInvitation(inviteId, input);
         setBackofficeSession(session);
         return session;
       });
@@ -96,4 +104,18 @@ export function usePortalApp() {
       return runAction(() => appApi.ocrDemo.createJob(input));
     }
   };
+}
+
+function resolveActionError(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "payload" in error &&
+    typeof (error as { payload?: unknown }).payload === "object" &&
+    (error as { payload?: { error?: { message?: string } } }).payload?.error?.message
+  ) {
+    return (error as { payload: { error: { message: string } } }).payload.error.message;
+  }
+
+  return error instanceof Error ? error.message : "unknown_error";
 }

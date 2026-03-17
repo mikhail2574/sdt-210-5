@@ -19,6 +19,7 @@ import { ApplicationViewService } from "./services/application-view.service";
 import { AuthService } from "./services/auth.service";
 import { BackofficeService } from "./services/backoffice.service";
 import { EffectiveFormService } from "./services/effective-form.service";
+import { EmailService } from "./services/email.service";
 import { PageValidationService } from "./services/page-validation.service";
 import { PublicDemoSeedService } from "./services/public-demo-seed.service";
 import { PublicApplicationsService } from "./services/public-applications.service";
@@ -44,6 +45,7 @@ import { PublicApplicationsService } from "./services/public-applications.servic
     EffectiveFormService,
     PageValidationService,
     ApplicationViewService,
+    EmailService,
     AuthService,
     PublicApplicationsService,
     BackofficeService,

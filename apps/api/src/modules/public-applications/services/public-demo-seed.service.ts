@@ -152,13 +152,22 @@ export class PublicDemoSeedService implements OnApplicationBootstrap {
     );
 
     await this.tenantUserRepository.save(
-      this.tenantUserRepository.create({
-        id: demoStaffMembershipId,
-        tenantId: demoTenantId,
-        userId: demoStaffUserId,
-        roleKey: "TENANT_ADMIN",
-        permissionsJson: {}
-      })
+      [
+        this.tenantUserRepository.create({
+          id: demoStaffMembershipId,
+          tenantId: demoTenantId,
+          userId: demoStaffUserId,
+          roleKey: "TENANT_ADMIN",
+          permissionsJson: {}
+        }),
+        this.tenantUserRepository.create({
+          id: "10000000-0000-4000-8000-000000000304",
+          tenantId: softDemoTenantId,
+          userId: demoStaffUserId,
+          roleKey: "TENANT_ADMIN",
+          permissionsJson: {}
+        })
+      ]
     );
 
     await this.invitationRepository.save(

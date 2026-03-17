@@ -4,6 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Button } from "@/components/atoms/Button";
+import { FormMessage } from "@/components/atoms/FormMessage";
+import { TextInput } from "@/components/atoms/TextInput";
+import { FormField } from "@/components/molecules/FormField";
 import { usePortalApp } from "@/hooks/usePortalApp";
 import type { Locale } from "@/lib/i18n";
 
@@ -35,17 +39,19 @@ export function CustomerLoginForm({ locale }: CustomerLoginFormProps) {
         }
       }}
     >
-      <label htmlFor="trackingCode">{t("customerLogin.trackingCode")}</label>
-      <input className="field-control" id="trackingCode" onChange={(event) => setTrackingCode(event.target.value)} value={trackingCode} />
+      <FormField htmlFor="trackingCode" label={t("customerLogin.trackingCode")}>
+        <TextInput id="trackingCode" onChange={(event) => setTrackingCode(event.target.value)} value={trackingCode} />
+      </FormField>
 
-      <label htmlFor="password">{t("customerLogin.password")}</label>
-      <input className="field-control" id="password" onChange={(event) => setPassword(event.target.value)} type="password" value={password} />
+      <FormField htmlFor="password" label={t("customerLogin.password")}>
+        <TextInput id="password" onChange={(event) => setPassword(event.target.value)} type="password" value={password} />
+      </FormField>
 
-      {error ? <p className="field-message">{t("customerLogin.error")}</p> : null}
+      {error ? <FormMessage>{t("customerLogin.error")}</FormMessage> : null}
 
-      <button className="wizard-button" disabled={loading} type="submit">
+      <Button disabled={loading} type="submit">
         {loading ? t("customerLogin.loading") : t("customerLogin.submit")}
-      </button>
+      </Button>
     </form>
   );
 }

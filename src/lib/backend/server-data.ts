@@ -233,6 +233,20 @@ export async function getBackofficeApplications(tenantId: string, filters: Recor
   }>(`/tenants/${tenantId}/applications${suffix}`);
 }
 
+export async function getBackofficeApplicationsForTenants(tenantIds: string[], filters: Record<string, string | undefined> = {}) {
+  const payloads = await Promise.all(tenantIds.map((tenantId) => getBackofficeApplications(tenantId, filters)));
+  const items = payloads
+    .flatMap((payload) => payload.items)
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+
+  return {
+    items,
+    page: 1,
+    pageSize: items.length,
+    total: items.length
+  };
+}
+
 export async function getBackofficeApplicationDetail(tenantId: string, applicationId: string) {
   try {
     return await requestBackofficeJson<BackofficeApplicationDetail>(`/tenants/${tenantId}/applications/${applicationId}`);
@@ -245,6 +259,18 @@ export async function getBackofficeApplicationDetail(tenantId: string, applicati
   }
 }
 
+export async function getBackofficeApplicationDetailForTenants(tenantIds: string[], applicationId: string) {
+  for (const tenantId of tenantIds) {
+    const detail = await getBackofficeApplicationDetail(tenantId, applicationId);
+
+    if (detail) {
+      return detail;
+    }
+  }
+
+  return null;
+}
+
 export async function getBackofficeNotifications(tenantId: string) {
   const payload = await requestBackofficeJson<{
     unreadCount: number;
@@ -252,6 +278,18 @@ export async function getBackofficeNotifications(tenantId: string) {
   }>(`/tenants/${tenantId}/notifications`);
 
   return payload;
+}
+
+export async function getBackofficeNotificationsForTenants(tenantIds: string[]) {
+  const payloads = await Promise.all(tenantIds.map((tenantId) => getBackofficeNotifications(tenantId)));
+  const items = payloads
+    .flatMap((payload) => payload.items)
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+
+  return {
+    unreadCount: items.length,
+    items
+  };
 }
 
 export async function getBackofficeInvitations(tenantId: string) {

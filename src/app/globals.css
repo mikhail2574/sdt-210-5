@@ -377,6 +377,10 @@ textarea {
   color: var(--tenant-warning, #8a5a00);
 }
 
+.field-message.success {
+  color: #1f6b3b;
+}
+
 .upload-list,
 .compact-list {
   display: grid;

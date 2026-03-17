@@ -4,6 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Button } from "@/components/atoms/Button";
+import { FormMessage } from "@/components/atoms/FormMessage";
+import { SelectInput } from "@/components/atoms/SelectInput";
+import { TextInput } from "@/components/atoms/TextInput";
+import { FormField } from "@/components/molecules/FormField";
 import { usePortalApp } from "@/hooks/usePortalApp";
 
 type InviteUserFormProps = {
@@ -16,12 +21,14 @@ export function InviteUserForm({ tenantId }: InviteUserFormProps) {
   const { error, inviteUser, loading } = usePortalApp();
   const [email, setEmail] = useState("new.user@stadtwerke.demo");
   const [role, setRole] = useState("Sachbearbeitung");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   return (
     <form
       className="stack-form"
       onSubmit={async (event) => {
         event.preventDefault();
+        setSuccessMessage(null);
 
         try {
           await inviteUser(tenantId, {
@@ -29,25 +36,29 @@ export function InviteUserForm({ tenantId }: InviteUserFormProps) {
             role
           });
 
+          setSuccessMessage(t("backoffice.inviteSent", { email }));
           router.refresh();
         } catch {}
       }}
     >
-      <label htmlFor="invite-email">{t("backoffice.inviteEmail")}</label>
-      <input className="field-control" id="invite-email" onChange={(event) => setEmail(event.target.value)} type="email" value={email} />
+      <FormField htmlFor="invite-email" label={t("backoffice.inviteEmail")}>
+        <TextInput id="invite-email" onChange={(event) => setEmail(event.target.value)} type="email" value={email} />
+      </FormField>
 
-      <label htmlFor="invite-role">{t("backoffice.inviteRole")}</label>
-      <select className="field-control" id="invite-role" onChange={(event) => setRole(event.target.value)} value={role}>
-        <option value="Sachbearbeitung">Sachbearbeitung</option>
-        <option value="Admin">Admin</option>
-        <option value="Installateur">Installateur</option>
-      </select>
+      <FormField htmlFor="invite-role" label={t("backoffice.inviteRole")}>
+        <SelectInput id="invite-role" onChange={(event) => setRole(event.target.value)} value={role}>
+          <option value="Sachbearbeitung">Sachbearbeitung</option>
+          <option value="Admin">Admin</option>
+          <option value="Installateur">Installateur</option>
+        </SelectInput>
+      </FormField>
 
-      {error ? <p className="field-message">{t("backoffice.actionError")}</p> : null}
+      {error ? <FormMessage>{error}</FormMessage> : null}
+      {successMessage ? <FormMessage tone="success">{successMessage}</FormMessage> : null}
 
-      <button className="wizard-button" disabled={loading} type="submit">
+      <Button disabled={loading} type="submit">
         {t("backoffice.inviteSubmit")}
-      </button>
+      </Button>
     </form>
   );
 }

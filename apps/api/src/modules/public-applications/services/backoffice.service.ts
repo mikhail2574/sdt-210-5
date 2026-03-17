@@ -22,6 +22,7 @@ import { type UpdateStaffPageDto } from "../dto/update-staff-page.dto";
 import { type FormOverrideOperation, type ThemeConfig } from "../form-schema.types";
 import { ApplicationViewService } from "./application-view.service";
 import { AuthService } from "./auth.service";
+import { EmailService } from "./email.service";
 import { EffectiveFormService } from "./effective-form.service";
 import { PageValidationService } from "./page-validation.service";
 
@@ -53,7 +54,9 @@ export class BackofficeService {
     @Inject(PageValidationService)
     private readonly pageValidationService: PageValidationService,
     @Inject(ApplicationViewService)
-    private readonly applicationViewService: ApplicationViewService
+    private readonly applicationViewService: ApplicationViewService,
+    @Inject(EmailService)
+    private readonly emailService: EmailService
   ) {}
 
   async getProfile(authorizationHeader: string | undefined) {
@@ -353,19 +356,49 @@ export class BackofficeService {
   }
 
   async createInvitation(authorizationHeader: string | undefined, tenantId: string, body: CreateInvitationDto) {
-    await this.authService.requireStaffContext(authorizationHeader, tenantId);
-    const invitation = await this.invitationRepository.save(
-      this.invitationRepository.create({
-        id: randomUUID(),
+    const context = await this.authService.requireStaffContext(authorizationHeader, tenantId);
+    const tenant = await this.tenantRepository.findOne({
+      where: { id: tenantId }
+    });
+
+    if (!tenant) {
+      throw new ApiResourceNotFoundException("Tenant not found");
+    }
+
+    const email = body.email.trim().toLowerCase();
+    const existingPendingInvitation = await this.invitationRepository.findOne({
+      where: {
         tenantId,
-        email: body.email.trim().toLowerCase(),
-        roleKey: body.role,
-        tokenHash: randomUUID(),
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-        status: "PENDING",
-        acceptedAt: null
-      })
-    );
+        email,
+        status: "PENDING"
+      }
+    });
+
+    if (existingPendingInvitation && existingPendingInvitation.expiresAt.getTime() > Date.now()) {
+      throw new ApiConflictException("A pending invitation already exists for this email address.");
+    }
+
+    const invitation = this.invitationRepository.create({
+      id: randomUUID(),
+      tenantId,
+      email,
+      roleKey: body.role,
+      tokenHash: randomUUID(),
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      status: "PENDING",
+      acceptedAt: null
+    });
+
+    await this.emailService.sendInvitationEmail({
+      email: invitation.email,
+      expiresAt: invitation.expiresAt,
+      inviteId: invitation.id,
+      invitedBy: context.user.displayName,
+      role: invitation.roleKey,
+      tenantName: tenant.name
+    });
+
+    await this.invitationRepository.save(invitation);
 
     return {
       id: invitation.id,

@@ -4,6 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Button } from "@/components/atoms/Button";
+import { FormMessage } from "@/components/atoms/FormMessage";
+import { TextInput } from "@/components/atoms/TextInput";
+import { FormField } from "@/components/molecules/FormField";
 import { usePortalApp } from "@/hooks/usePortalApp";
 import type { ThemeConfig } from "@/lib/forms/types";
 
@@ -76,23 +80,27 @@ export function ThemeEditorForm({ tenantId, theme }: ThemeEditorFormProps) {
         } catch {}
       }}
     >
-      <label htmlFor="theme-primary">{t("backoffice.themePrimary")}</label>
-      <input className="field-control" id="theme-primary" onChange={(event) => patch("primary", event.target.value)} value={draftTheme.palette.primary} />
+      <FormField htmlFor="theme-primary" label={t("backoffice.themePrimary")}>
+        <TextInput id="theme-primary" onChange={(event) => patch("primary", event.target.value)} value={draftTheme.palette.primary} />
+      </FormField>
 
-      <label htmlFor="theme-secondary">{t("backoffice.themeSecondary")}</label>
-      <input className="field-control" id="theme-secondary" onChange={(event) => patch("secondary", event.target.value)} value={draftTheme.palette.secondary} />
+      <FormField htmlFor="theme-secondary" label={t("backoffice.themeSecondary")}>
+        <TextInput id="theme-secondary" onChange={(event) => patch("secondary", event.target.value)} value={draftTheme.palette.secondary} />
+      </FormField>
 
-      <label htmlFor="theme-accent">{t("backoffice.themeAccent")}</label>
-      <input className="field-control" id="theme-accent" onChange={(event) => patch("accent", event.target.value)} value={draftTheme.palette.accent} />
+      <FormField htmlFor="theme-accent" label={t("backoffice.themeAccent")}>
+        <TextInput id="theme-accent" onChange={(event) => patch("accent", event.target.value)} value={draftTheme.palette.accent} />
+      </FormField>
 
-      <label htmlFor="theme-font-size">{t("backoffice.themeFontSize")}</label>
-      <input className="field-control" id="theme-font-size" onChange={(event) => patch("fontSize", event.target.value)} type="number" value={draftTheme.typography.baseFontSizePx} />
+      <FormField htmlFor="theme-font-size" label={t("backoffice.themeFontSize")}>
+        <TextInput id="theme-font-size" onChange={(event) => patch("fontSize", event.target.value)} type="number" value={draftTheme.typography.baseFontSizePx} />
+      </FormField>
 
-      {error ? <p className="field-message">{t("backoffice.actionError")}</p> : null}
+      {error ? <FormMessage>{t("backoffice.actionError")}</FormMessage> : null}
 
-      <button className="wizard-button" disabled={loading} type="submit">
+      <Button disabled={loading} type="submit">
         {t("backoffice.themeSubmit")}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -13,7 +13,8 @@ This repo is a Week 6 "Assemble First" delivery for a Stadtwerke white-label `Ku
 5. The real source of truth is the Nest backend in `apps/api`; do not add new in-process demo persistence for application, auth, backoffice, theme, invitation, or form-override flows.
 6. Next route handlers under `src/app/api` should stay thin and proxy to the backend while handling same-origin cookies for the web app.
 7. UI components should stay thin and call the async hook `src/hooks/usePortalApp.ts` for backend mutations.
-8. Keep high-level components at a single level of abstraction:
+8. Prefer building new shared frontend controls from `src/components/atoms` and `src/components/molecules` before duplicating raw form markup.
+9. Keep high-level components at a single level of abstraction:
    - pages assemble sections and fetch data
    - components render UI and call hook operations
    - backend helpers own transport and request shaping
@@ -43,9 +44,13 @@ This repo is a Week 6 "Assemble First" delivery for a Stadtwerke white-label `Ku
 - `src/lib/backend/server-data.ts`: server-side data fetching helpers
 - `src/services/ocr-demo-service.ts`: local OCR demo persistence only
 - `src/hooks/usePortalApp.ts`: thin async hook with `loading` and `error`
+- `src/components/atoms/*`: reusable primitive controls
+- `src/components/molecules/*`: small composite UI building blocks
 - `src/app/[locale]/...`: page routes
 - `src/components/...`: UI only
 - `apps/api/src/modules/public-applications/...`: backend business logic
+- `apps/api/src/modules/public-applications/services/email-config.ts`: SMTP and invitation mail config
+- `apps/api/src/modules/public-applications/services/email.service.ts`: outbound invitation email delivery
 
 ## Conventions
 

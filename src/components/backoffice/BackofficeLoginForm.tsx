@@ -4,6 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Button } from "@/components/atoms/Button";
+import { FormMessage } from "@/components/atoms/FormMessage";
+import { TextInput } from "@/components/atoms/TextInput";
+import { FormField } from "@/components/molecules/FormField";
 import { usePortalApp } from "@/hooks/usePortalApp";
 import type { Locale } from "@/lib/i18n";
 
@@ -34,17 +38,19 @@ export function BackofficeLoginForm({ locale }: BackofficeLoginFormProps) {
         }
       }}
     >
-      <label htmlFor="staff-email">{t("backoffice.email")}</label>
-      <input className="field-control" id="staff-email" onChange={(event) => setEmail(event.target.value)} type="email" value={email} />
+      <FormField htmlFor="staff-email" label={t("backoffice.email")}>
+        <TextInput id="staff-email" onChange={(event) => setEmail(event.target.value)} type="email" value={email} />
+      </FormField>
 
-      <label htmlFor="staff-password">{t("backoffice.password")}</label>
-      <input className="field-control" id="staff-password" onChange={(event) => setPassword(event.target.value)} type="password" value={password} />
+      <FormField htmlFor="staff-password" label={t("backoffice.password")}>
+        <TextInput id="staff-password" onChange={(event) => setPassword(event.target.value)} type="password" value={password} />
+      </FormField>
 
-      {error ? <p className="field-message">{t("backoffice.loginError")}</p> : null}
+      {error ? <FormMessage>{t("backoffice.loginError")}</FormMessage> : null}
 
-      <button className="wizard-button" disabled={loading} type="submit">
+      <Button disabled={loading} type="submit">
         {loading ? t("backoffice.loggingIn") : t("backoffice.loginSubmit")}
-      </button>
+      </Button>
     </form>
   );
 }

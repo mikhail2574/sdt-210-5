@@ -85,9 +85,11 @@ export class AuthService {
       throw new ApiUnauthorizedException("Invalid email or password");
     }
 
-    const membership = await this.tenantUserRepository.findOne({
-      where: { userId: user.id }
+    const memberships = await this.tenantUserRepository.find({
+      where: { userId: user.id },
+      order: { tenantId: "ASC" }
     });
+    const membership = memberships[0] ?? null;
 
     if (!membership) {
       throw new ApiUnauthorizedException("No tenant membership found");
@@ -96,7 +98,7 @@ export class AuthService {
     user.lastLoginAt = new Date();
     await this.userRepository.save(user);
 
-    return this.buildStaffAuthContext(user, membership);
+    return this.buildStaffAuthContext(user, membership, memberships);
   }
 
   async getProfile(authorizationHeader: string | undefined) {
@@ -115,22 +117,25 @@ export class AuthService {
       throw new ApiUnauthorizedException("User not found");
     }
 
-    const membership = await this.tenantUserRepository.findOne({
-      where: {
-        userId: user.id,
-        tenantId: payload.tenantId
-      }
+    const memberships = await this.tenantUserRepository.find({
+      where: { userId: user.id },
+      order: { tenantId: "ASC" }
     });
+    const membership =
+      memberships.find((item) => item.tenantId === (tenantId ?? payload.tenantId)) ??
+      memberships.find((item) => item.tenantId === payload.tenantId) ??
+      memberships[0] ??
+      null;
 
     if (!membership) {
       throw new ApiUnauthorizedException("Membership not found");
     }
 
-    if (tenantId && payload.tenantId !== tenantId) {
+    if (tenantId && membership.tenantId !== tenantId) {
       throw new ApiTenantIsolationException("Cross-tenant token usage denied");
     }
 
-    return this.buildStaffAuthContext(user, membership);
+    return this.buildStaffAuthContext(user, membership, memberships);
   }
 
   async loginCustomer(trackingCode: string, password: string) {
@@ -228,12 +233,13 @@ export class AuthService {
     return application;
   }
 
-  private buildStaffAuthContext(user: UserEntity, membership: TenantUserEntity): StaffAuthContext {
+  private buildStaffAuthContext(user: UserEntity, membership: TenantUserEntity, memberships?: TenantUserEntity[]): StaffAuthContext {
     const accessToken = this.issueStaffToken({
       userId: user.id,
       tenantId: membership.tenantId,
       roleKey: membership.roleKey
     });
+    const knownMemberships = memberships ?? [membership];
 
     return {
       accessToken,
@@ -244,12 +250,10 @@ export class AuthService {
         displayName: user.displayName,
         role: membership.roleKey,
         tenantId: membership.tenantId,
-        tenants: [
-          {
-            tenantId: membership.tenantId,
-            role: membership.roleKey
-          }
-        ]
+        tenants: knownMemberships.map((item) => ({
+          tenantId: item.tenantId,
+          role: item.roleKey
+        }))
       }
     };
   }

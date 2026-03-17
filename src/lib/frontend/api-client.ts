@@ -122,6 +122,9 @@ export function createBrowserFrontendApi(fetchImpl: FetchLike = defaultFetch): F
       login(input) {
         return requestJson(fetchImpl, "/api/auth/login", createJsonRequestInit("POST", input));
       },
+      acceptInvitation(inviteId, input) {
+        return requestJson(fetchImpl, `/api/invitations/${inviteId}/accept`, createJsonRequestInit("POST", input));
+      },
       async logout() {
         await requestJson(fetchImpl, "/api/auth/logout", createJsonRequestInit("POST"));
       }

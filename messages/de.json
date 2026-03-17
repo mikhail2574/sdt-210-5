@@ -344,6 +344,14 @@
     "resume": "Antrag fortsetzen",
     "logout": "Abmelden"
   },
+  "invitationAccept": {
+    "title": "Mitarbeitereinladung annehmen",
+    "description": "Lege deinen Anzeigenamen und dein Passwort fest, um dein Backoffice-Konto zu aktivieren.",
+    "displayName": "Anzeigename",
+    "password": "Passwort",
+    "submit": "Konto aktivieren",
+    "submitting": "Konto wird aktiviert…"
+  },
   "backoffice": {
     "productLabel": "Internes Backoffice",
     "title": "Antrags-Backoffice",
@@ -412,6 +420,7 @@
     "inviteEmail": "E-Mail",
     "inviteRole": "Rolle",
     "inviteSubmit": "Einladung senden",
+    "inviteSent": "Einladungs-E-Mail an {email} gesendet.",
     "sentInvitations": "Versendete Einladungen",
     "themeTitle": "Theme Einstellungen",
     "themeDescription": "Aktualisiere Tenant-Farben und Typografie für das öffentliche Portal.",

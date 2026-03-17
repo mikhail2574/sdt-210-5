@@ -344,6 +344,14 @@
     "resume": "Continue application",
     "logout": "Log out"
   },
+  "invitationAccept": {
+    "title": "Accept staff invitation",
+    "description": "Set your display name and password to activate your backoffice account.",
+    "displayName": "Display name",
+    "password": "Password",
+    "submit": "Activate account",
+    "submitting": "Activating account…"
+  },
   "backoffice": {
     "productLabel": "Internal backoffice",
     "title": "Applications backoffice",
@@ -412,6 +420,7 @@
     "inviteEmail": "Email",
     "inviteRole": "Role",
     "inviteSubmit": "Send invitation",
+    "inviteSent": "Invitation email sent to {email}.",
     "sentInvitations": "Sent invitations",
     "themeTitle": "Theme settings",
     "themeDescription": "Update tenant palette values and typography for the public portal.",

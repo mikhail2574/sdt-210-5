@@ -31,6 +31,11 @@ export type StaffLoginInput = {
   password: string;
 };
 
+export type AcceptInvitationInput = {
+  displayName: string;
+  password: string;
+};
+
 export type PublicValidationItem = {
   fieldPath: string;
   labelKey: string;
@@ -102,6 +107,7 @@ export interface CustomerAuthApi {
 
 export interface StaffAuthApi {
   login(input: StaffLoginInput): Promise<StaffSession>;
+  acceptInvitation(inviteId: string, input: AcceptInvitationInput): Promise<StaffSession>;
   logout(): Promise<void>;
 }
 

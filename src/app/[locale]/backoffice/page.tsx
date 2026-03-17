@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { getBackofficeApplications, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
+import { getBackofficeApplicationsForTenants, getBackofficeNotificationsForTenants, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -22,9 +22,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
+  const tenantIds = user.tenants.map((tenant) => tenant.tenantId);
   const [applicationsPayload, notificationsPayload] = await Promise.all([
-    getBackofficeApplications(user.tenantId),
-    getBackofficeNotifications(user.tenantId)
+    getBackofficeApplicationsForTenants(tenantIds),
+    getBackofficeNotificationsForTenants(tenantIds)
   ]);
   const applications = applicationsPayload.items;
   const notifications = notificationsPayload.items;

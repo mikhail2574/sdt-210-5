@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { getBackofficeApplications, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
+import { getBackofficeApplicationsForTenants, getBackofficeNotificationsForTenants, requireServerStaffUser } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -27,9 +27,10 @@ export default async function ApplicationsListPage({ params, searchParams }: App
 
   const messages = await getMessages(locale as Locale);
   const user = await requireServerStaffUser(locale as Locale);
+  const tenantIds = user.tenants.map((tenant) => tenant.tenantId);
   const [notificationsPayload, applicationsPayload] = await Promise.all([
-    getBackofficeNotifications(user.tenantId),
-    getBackofficeApplications(user.tenantId, {
+    getBackofficeNotificationsForTenants(tenantIds),
+    getBackofficeApplicationsForTenants(tenantIds, {
       status: filters.status,
       unread: filters.unread
     })
@@ -58,7 +59,9 @@ export default async function ApplicationsListPage({ params, searchParams }: App
       <form className="filters-bar" method="get">
         <select className="field-control" defaultValue={filters.status ?? ""} name="status">
           <option value="">{messages.backoffice.filters.allStatuses}</option>
+          <option value="DRAFT">DRAFT</option>
           <option value="SUBMITTED_INCOMPLETE">SUBMITTED_INCOMPLETE</option>
+          <option value="SUBMITTED_COMPLETE">SUBMITTED_COMPLETE</option>
           <option value="UNDER_REVIEW">UNDER_REVIEW</option>
           <option value="SCHEDULED">SCHEDULED</option>
         </select>

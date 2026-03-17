@@ -695,6 +695,18 @@ describe("Public applications and backoffice API", () => {
     expect(loginResponse.body.applicationId).toBe(draftApplicationId);
     expect(loginResponse.body.status).toBe("SUBMITTED_INCOMPLETE");
 
+    const incompletePdfResponse = await request(app.getHttpServer())
+      .get(`/api/public/applications/${draftApplicationId}/pdf`)
+      .buffer(true)
+      .parse(binaryParser)
+      .expect(200);
+
+    const incompletePdfText = (incompletePdfResponse.body as Buffer).toString("latin1");
+
+    expect(incompletePdfText).toContain("Hausanschlussantrag");
+    expect(incompletePdfText).toContain("Eingegangen mit offenen Punkten");
+    expect(incompletePdfText).toContain("Offene Punkte");
+
     await request(app.getHttpServer())
       .put(`/api/public/applications/${draftApplicationId}/pages/antragsdetails`)
       .send({
@@ -750,8 +762,17 @@ describe("Public applications and backoffice API", () => {
       .parse(binaryParser)
       .expect(200);
 
+    const pdfBuffer = pdfResponse.body as Buffer;
+    const pdfText = pdfBuffer.toString("latin1");
+
     expect(pdfResponse.headers["content-type"]).toContain("application/pdf");
-    expect((pdfResponse.body as Buffer).length).toBeGreaterThan(0);
+    expect(pdfBuffer.length).toBeGreaterThan(1500);
+    expect(pdfText).toContain("%PDF-1.4");
+    expect(pdfText).toContain("Hausanschlussantrag");
+    expect(pdfText).toContain("Aktenzeichen");
+    expect(pdfText).toContain("Erika Mustermann");
+    expect(pdfText).toContain("Lageplan");
+    expect(pdfText).toContain("Offene Punkte");
   });
 
   it("denies page updates when application tenant does not match form tenant", async () => {

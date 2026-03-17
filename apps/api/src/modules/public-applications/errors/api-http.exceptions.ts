@@ -1,4 +1,11 @@
-import { ConflictException, ForbiddenException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  ServiceUnavailableException,
+  UnauthorizedException,
+  UnprocessableEntityException
+} from "@nestjs/common";
 
 type ErrorDetail = {
   path: string;
@@ -42,5 +49,11 @@ export class ApiUnauthorizedException extends UnauthorizedException {
 export class ApiConflictException extends ConflictException {
   constructor(message: string) {
     super(buildErrorBody("CONFLICT", message));
+  }
+}
+
+export class ApiServiceUnavailableException extends ServiceUnavailableException {
+  constructor(message: string) {
+    super(buildErrorBody("SERVICE_UNAVAILABLE", message));
   }
 }
