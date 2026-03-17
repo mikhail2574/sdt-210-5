@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requestBackendJson } from "@/lib/backend/api-gateway";
+import { isBackendConnectionError, requestBackendJson } from "@/lib/backend/api-gateway";
 import { staffSessionCookieName } from "@/lib/demo/session";
 
 export async function POST(request: Request) {
@@ -34,6 +34,18 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "BACKEND_UNAVAILABLE",
+            message: "Backend API is unavailable. Start it with 'pnpm run api:dev'."
+          }
+        },
+        { status: 503 }
+      );
+    }
+
     if (error instanceof Error && "status" in error) {
       const status = Number((error as { status?: number }).status ?? 500);
       const payload = (error as { payload?: unknown }).payload ?? {

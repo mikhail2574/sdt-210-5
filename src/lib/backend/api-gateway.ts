@@ -20,12 +20,27 @@ export class BackendApiError<TPayload = unknown> extends Error {
   }
 }
 
+export class BackendConnectionError extends Error {
+  readonly name = "BackendConnectionError";
+
+  constructor(
+    readonly url: string,
+    readonly originalError?: unknown
+  ) {
+    super(`BACKEND_UNAVAILABLE:${url}`);
+  }
+}
+
 export function getBackendApiBaseUrl() {
   return backendApiBaseUrl;
 }
 
 export function getPublicApiBaseUrl() {
   return `${backendApiBaseUrl}/public`;
+}
+
+export function isBackendConnectionError(error: unknown): error is BackendConnectionError {
+  return error instanceof BackendConnectionError;
 }
 
 function createHeaders(initHeaders?: HeadersInit, hasBody = false) {
@@ -56,12 +71,17 @@ function buildApiUrl(pathname: string) {
 
 export async function requestBackend(pathname: string, init?: RequestInit) {
   const hasBody = init?.body !== undefined;
+  const url = buildApiUrl(pathname);
 
-  return fetch(buildApiUrl(pathname), {
-    ...init,
-    cache: "no-store",
-    headers: createHeaders(init?.headers, hasBody)
-  });
+  try {
+    return await fetch(url, {
+      ...init,
+      cache: "no-store",
+      headers: createHeaders(init?.headers, hasBody)
+    });
+  } catch (error) {
+    throw new BackendConnectionError(url, error);
+  }
 }
 
 export async function requestPublicBackend(pathname: string, init?: RequestInit) {
@@ -131,44 +151,101 @@ function copyResponseHeaders(source: Response) {
   return headers;
 }
 
+function createUnavailablePayload() {
+  return {
+    error: {
+      code: "BACKEND_UNAVAILABLE",
+      message: `Backend API is unavailable at ${backendApiBaseUrl}. Start it with 'pnpm run api:dev'.`
+    }
+  };
+}
+
 export async function proxyBackendJson(pathname: string, init?: RequestInit) {
-  const response = await requestBackend(pathname, init);
-  const payload = await parseJson<unknown>(response);
-  return NextResponse.json(payload ?? {}, { status: response.status });
+  try {
+    const response = await requestBackend(pathname, init);
+    const payload = await parseJson<unknown>(response);
+    return NextResponse.json(payload ?? {}, { status: response.status });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function proxyPublicBackendJson(pathname: string, init?: RequestInit) {
-  const response = await requestPublicBackend(pathname, init);
-  const payload = await parseJson<unknown>(response);
-  return NextResponse.json(payload ?? {}, { status: response.status });
+  try {
+    const response = await requestPublicBackend(pathname, init);
+    const payload = await parseJson<unknown>(response);
+    return NextResponse.json(payload ?? {}, { status: response.status });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function proxyBackofficeJson(pathname: string, init?: RequestInit) {
-  const response = await requestBackend(pathname, await withStaffAuthorization(init));
-  const payload = await parseJson<unknown>(response);
-  return NextResponse.json(payload ?? {}, { status: response.status });
+  try {
+    const response = await requestBackend(pathname, await withStaffAuthorization(init));
+    const payload = await parseJson<unknown>(response);
+    return NextResponse.json(payload ?? {}, { status: response.status });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function proxyBackendBinary(pathname: string, init?: RequestInit) {
-  const response = await requestBackend(pathname, init);
-  return new NextResponse(await readResponseBuffer(response), {
-    status: response.status,
-    headers: copyResponseHeaders(response)
-  });
+  try {
+    const response = await requestBackend(pathname, init);
+    return new NextResponse(await readResponseBuffer(response), {
+      status: response.status,
+      headers: copyResponseHeaders(response)
+    });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function proxyPublicBackendBinary(pathname: string, init?: RequestInit) {
-  const response = await requestPublicBackend(pathname, init);
-  return new NextResponse(await readResponseBuffer(response), {
-    status: response.status,
-    headers: copyResponseHeaders(response)
-  });
+  try {
+    const response = await requestPublicBackend(pathname, init);
+    return new NextResponse(await readResponseBuffer(response), {
+      status: response.status,
+      headers: copyResponseHeaders(response)
+    });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }
 
 export async function proxyBackofficeBinary(pathname: string, init?: RequestInit) {
-  const response = await requestBackend(pathname, await withStaffAuthorization(init));
-  return new NextResponse(await readResponseBuffer(response), {
-    status: response.status,
-    headers: copyResponseHeaders(response)
-  });
+  try {
+    const response = await requestBackend(pathname, await withStaffAuthorization(init));
+    return new NextResponse(await readResponseBuffer(response), {
+      status: response.status,
+      headers: copyResponseHeaders(response)
+    });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return NextResponse.json(createUnavailablePayload(), { status: 503 });
+    }
+
+    throw error;
+  }
 }

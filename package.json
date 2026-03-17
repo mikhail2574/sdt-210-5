@@ -2,7 +2,8 @@
   "name": "sdt-210-5",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "next dev",
     "build": "next build",
     "start": "next start",
     "api:compile": "tsc -p apps/api/tsconfig.runtime.json",
