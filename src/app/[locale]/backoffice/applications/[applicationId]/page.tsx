@@ -1,7 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ApplicationAuditLog } from "@/components/backoffice/ApplicationAuditLog";
 import { ApplicationActions } from "@/components/backoffice/ApplicationActions";
+import { ApplicationHeader } from "@/components/backoffice/ApplicationHeader";
+import { ApplicationPageDataGrid } from "@/components/backoffice/ApplicationPageDataGrid";
+import { ApplicationStatusGrid } from "@/components/backoffice/ApplicationStatusGrid";
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
 import { getBackofficeApplicationDetailForTenants, getBackofficePageContext } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
@@ -48,74 +51,30 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
       unreadCount={unreadCount}
       userName={user.displayName}
     >
-      <div className="panel-header">
-        <div>
-          <h2>{application.customerSummary.name}</h2>
-          <p>{application.customerSummary.address}</p>
-        </div>
-        <div className="panel-header-actions">
-          <a className="secondary-button" href={`/api/tenants/${application.tenantId}/applications/${applicationId}/pdf?kind=APPLICATION_PDF`}>
-            {messages.backoffice.downloadPdf}
-          </a>
-          <Link className="inline-link" href={`/${locale}/applications/${applicationId}`}>
-            {messages.backoffice.openCustomerView}
-          </Link>
-        </div>
-      </div>
+      <ApplicationHeader
+        application={application}
+        applicationId={applicationId}
+        downloadPdfLabel={messages.backoffice.downloadPdf}
+        locale={locale}
+        openCustomerViewLabel={messages.backoffice.openCustomerView}
+      />
 
-      <div className="status-grid">
-        <section className="status-card">
-          <h3>{messages.backoffice.statusTitle}</h3>
-          <p className="status-chip">{application.status}</p>
-          <p>{application.trackingCode}</p>
-          {application.staffModifiedFields.length > 0 ? (
-            <p>
-              {messages.backoffice.modifiedFieldsTitle}: {application.staffModifiedFields.length}
-            </p>
-          ) : null}
-        </section>
-
-        <section className="status-card">
-          <h3>{messages.backoffice.timelineTitle}</h3>
-          <ol className="timeline-list">
-            {application.timeline.map((entry) => (
-              <li key={`${entry.status}-${entry.at}`}>
-                <strong>{entry.status}</strong>
-                <span>{entry.note ?? entry.at}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </div>
+      <ApplicationStatusGrid
+        application={application}
+        modifiedFieldsTitle={messages.backoffice.modifiedFieldsTitle}
+        statusTitle={messages.backoffice.statusTitle}
+        timelineTitle={messages.backoffice.timelineTitle}
+      />
 
       <ApplicationActions applicationId={applicationId} editableFields={editableFields} tenantId={application.tenantId} />
 
-      <section className="review-grid">
-        {Object.entries(application.pageData).map(([pageKey, data]) => (
-          <article className="review-card" key={pageKey}>
-            <h3>{pageKey}</h3>
-            <dl className="review-list">
-              {Object.entries(data).map(([fieldKey, value]) => (
-                <div key={fieldKey}>
-                  <dt>{fieldKey}</dt>
-                  <dd>{Array.isArray(value) ? JSON.stringify(value) : typeof value === "object" && value !== null ? JSON.stringify(value) : String(value)}</dd>
-                </div>
-              ))}
-            </dl>
-          </article>
-        ))}
-      </section>
+      <ApplicationPageDataGrid pageData={application.pageData} />
 
-      <section className="review-card">
-        <h3>{messages.backoffice.auditTitle}</h3>
-        <ul className="compact-list">
-          {application.auditLog.map((entry) => (
-            <li key={entry.id}>
-              <strong>{entry.fieldPath}</strong> {messages.backoffice.auditChangedTo} {String(entry.newValue)} ({entry.reason})
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ApplicationAuditLog
+        auditChangedToLabel={messages.backoffice.auditChangedTo}
+        auditEntries={application.auditLog}
+        title={messages.backoffice.auditTitle}
+      />
     </BackofficeChrome>
   );
 }

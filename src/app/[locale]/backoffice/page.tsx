@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
 import { MetricCard } from "@/components/backoffice/MetricCard";
+import { NotificationsCard } from "@/components/backoffice/NotificationsCard";
+import { QuickLinksCard } from "@/components/backoffice/QuickLinksCard";
 import { getBackofficeApplicationsForTenants, getBackofficePageContext } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
@@ -46,25 +47,14 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       </div>
 
       <section className="dashboard-grid">
-        <article className="metric-card">
-          <h2>{messages.backoffice.quickLinks}</h2>
-          <div className="stack-links">
-            <Link href={`/${locale}/backoffice/applications?unread=true`}>{messages.backoffice.quickUnread}</Link>
-            <Link href={`/${locale}/backoffice/applications?status=SUBMITTED_INCOMPLETE`}>{messages.backoffice.quickIncomplete}</Link>
-            <Link href={`/${locale}/backoffice/admin/theme`}>{messages.backoffice.quickTheme}</Link>
-          </div>
-        </article>
-
-        <article className="metric-card">
-          <h2>{messages.backoffice.notifications}</h2>
-          <ul className="compact-list">
-            {notifications.map((notification) => (
-              <li key={notification.id}>
-                <Link href={`/${locale}/backoffice/applications/${notification.applicationId}`}>{notification.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </article>
+        <QuickLinksCard
+          locale={locale}
+          quickIncompleteLabel={messages.backoffice.quickIncomplete}
+          quickThemeLabel={messages.backoffice.quickTheme}
+          quickUnreadLabel={messages.backoffice.quickUnread}
+          title={messages.backoffice.quickLinks}
+        />
+        <NotificationsCard locale={locale} notifications={notifications} title={messages.backoffice.notifications} />
       </section>
     </BackofficeChrome>
   );
