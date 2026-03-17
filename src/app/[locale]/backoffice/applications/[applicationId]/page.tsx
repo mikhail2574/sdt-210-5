@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ApplicationActions } from "@/components/backoffice/ApplicationActions";
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { getBackofficeApplicationDetailForTenants, getBackofficeNotificationsForTenants, requireServerStaffUser } from "@/lib/backend/server-data";
+import { getBackofficeApplicationDetailForTenants, getBackofficePageContext } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -22,14 +22,11 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
     notFound();
   }
 
-  const messages = await getMessages(locale as Locale);
-  const user = await requireServerStaffUser(locale as Locale);
-  const tenantIds = user.tenants.map((tenant) => tenant.tenantId);
-  const [notificationsPayload, application] = await Promise.all([
-    getBackofficeNotificationsForTenants(tenantIds),
-    getBackofficeApplicationDetailForTenants(tenantIds, applicationId)
+  const [messages, { notifications, tenantIds, unreadCount, user }] = await Promise.all([
+    getMessages(locale as Locale),
+    getBackofficePageContext(locale as Locale)
   ]);
-  const notifications = notificationsPayload.items;
+  const application = await getBackofficeApplicationDetailForTenants(tenantIds, applicationId);
 
   if (!application) {
     notFound();
@@ -48,7 +45,7 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
       currentPath={`/${locale}/backoffice/applications`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notificationsPayload.unreadCount}
+      unreadCount={unreadCount}
       userName={user.displayName}
     >
       <div className="panel-header">

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
 import { FormOverrideEditor } from "@/components/backoffice/FormOverrideEditor";
-import { getBackofficeFormOverride, getBackofficeForms, getBackofficeNotifications, requireServerStaffUser } from "@/lib/backend/server-data";
+import { getBackofficeFormOverride, getBackofficeForms, getBackofficePageContext } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -20,13 +20,11 @@ export default async function FormsAdminPage({ params }: FormsAdminPageProps) {
     notFound();
   }
 
-  const messages = await getMessages(locale as Locale);
-  const user = await requireServerStaffUser(locale as Locale);
-  const [notificationsPayload, forms] = await Promise.all([
-    getBackofficeNotifications(user.tenantId),
-    getBackofficeForms(user.tenantId)
+  const [messages, { notifications, unreadCount, user }] = await Promise.all([
+    getMessages(locale as Locale),
+    getBackofficePageContext(locale as Locale)
   ]);
-  const notifications = notificationsPayload.items;
+  const forms = await getBackofficeForms(user.tenantId);
   const formOverrides = await Promise.all(forms.map((form) => getBackofficeFormOverride(user.tenantId, form.formId)));
 
   return (
@@ -34,7 +32,7 @@ export default async function FormsAdminPage({ params }: FormsAdminPageProps) {
       currentPath={`/${locale}/backoffice/admin/forms`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notificationsPayload.unreadCount}
+      unreadCount={unreadCount}
       userName={user.displayName}
     >
       <div className="panel-header">

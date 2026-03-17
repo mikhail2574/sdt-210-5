@@ -14,9 +14,10 @@ type PortalChromeProps = {
   currentPageKey?: PublicWizardPageKey;
   locale: Locale;
   theme: ThemeConfig;
+  title?: string;
 };
 
-export function PortalChrome({ children, currentPageKey, locale, theme }: PortalChromeProps) {
+export function PortalChrome({ children, currentPageKey, locale, theme, title }: PortalChromeProps) {
   const t = useTranslations();
 
   return (
@@ -27,7 +28,7 @@ export function PortalChrome({ children, currentPageKey, locale, theme }: Portal
             <img alt={t(theme.logo.altI18nKey)} src={theme.logo.url} />
             <div>
               <p>{t("wizard.headerTitle")}</p>
-              <strong>{t("forms.hausanschluss.title")}</strong>
+              <strong>{title ?? t("forms.hausanschluss.title")}</strong>
             </div>
           </div>
           <LanguageSwitcher locale={locale} />

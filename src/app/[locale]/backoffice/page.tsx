@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackofficeChrome } from "@/components/backoffice/BackofficeChrome";
-import { getBackofficeApplicationsForTenants, getBackofficeNotificationsForTenants, requireServerStaffUser } from "@/lib/backend/server-data";
+import { MetricCard } from "@/components/backoffice/MetricCard";
+import { getBackofficeApplicationsForTenants, getBackofficePageContext } from "@/lib/backend/server-data";
 import { getMessages, isLocale, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -20,16 +21,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     notFound();
   }
 
-  const messages = await getMessages(locale as Locale);
-  const user = await requireServerStaffUser(locale as Locale);
-  const tenantIds = user.tenants.map((tenant) => tenant.tenantId);
-  const [applicationsPayload, notificationsPayload] = await Promise.all([
-    getBackofficeApplicationsForTenants(tenantIds),
-    getBackofficeNotificationsForTenants(tenantIds)
+  const [messages, { notifications, tenantIds, unreadCount: notificationUnreadCount, user }] = await Promise.all([
+    getMessages(locale as Locale),
+    getBackofficePageContext(locale as Locale)
   ]);
+  const applicationsPayload = await getBackofficeApplicationsForTenants(tenantIds);
   const applications = applicationsPayload.items;
-  const notifications = notificationsPayload.items;
-  const unreadCount = applications.filter((item) => item.unreadByStaff).length;
+  const unreadApplicationCount = applications.filter((item) => item.unreadByStaff).length;
   const submittedIncompleteCount = applications.filter((item) => item.status === "SUBMITTED_INCOMPLETE").length;
   const scheduledCount = applications.filter((item) => item.status === "SCHEDULED").length;
 
@@ -38,22 +36,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       currentPath={`/${locale}/backoffice`}
       locale={locale as Locale}
       notifications={notifications}
-      unreadCount={notificationsPayload.unreadCount}
+      unreadCount={notificationUnreadCount}
       userName={user.displayName}
     >
       <div className="dashboard-grid">
-        <article className="metric-card">
-          <h2>{messages.backoffice.metrics.unread}</h2>
-          <strong>{unreadCount}</strong>
-        </article>
-        <article className="metric-card">
-          <h2>{messages.backoffice.metrics.incomplete}</h2>
-          <strong>{submittedIncompleteCount}</strong>
-        </article>
-        <article className="metric-card">
-          <h2>{messages.backoffice.metrics.scheduled}</h2>
-          <strong>{scheduledCount}</strong>
-        </article>
+        <MetricCard label={messages.backoffice.metrics.unread} value={unreadApplicationCount} />
+        <MetricCard label={messages.backoffice.metrics.incomplete} value={submittedIncompleteCount} />
+        <MetricCard label={messages.backoffice.metrics.scheduled} value={scheduledCount} />
       </div>
 
       <section className="dashboard-grid">

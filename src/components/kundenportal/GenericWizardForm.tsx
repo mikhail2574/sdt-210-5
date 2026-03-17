@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 import { ErrorSummary } from "@/components/kundenportal/ErrorSummary";
 import { PortalChrome } from "@/components/kundenportal/PortalChrome";
 import { SoftRequiredModal } from "@/components/kundenportal/SoftRequiredModal";
+import { WizardField } from "@/components/kundenportal/WizardField";
 import { isFrontendApiError } from "@/services/api";
 import type { ValidationErrorPayload } from "@/lib/frontend/api-contract";
 import { usePortalApp } from "@/hooks/usePortalApp";
+import { useFormDraftPersistence } from "@/hooks/useFormDraftPersistence";
 import { getPreviousWizardPageKey, type PublicWizardPageKey } from "@/lib/demo/public-flow";
 import {
   getSoftMissingWizardFields,
@@ -40,26 +42,6 @@ type ErrorMap = Record<
   }
 >;
 
-function getFieldBadge(requirement: WizardFieldConfig["requirement"], t: ReturnType<typeof useTranslations>) {
-  if (requirement === "required") {
-    return (
-      <span className="field-badge required" data-testid="required-badge">
-        {t("wizard.requiredBadge")}
-      </span>
-    );
-  }
-
-  if (requirement === "soft_required") {
-    return (
-      <span className="field-badge soft_required" data-testid="soft-required-badge">
-        {t("wizard.softRequiredBadge")}
-      </span>
-    );
-  }
-
-  return null;
-}
-
 export function GenericWizardForm({
   applicationId: initialApplicationId = null,
   formId,
@@ -75,8 +57,6 @@ export function GenericWizardForm({
   const hasHydrated = useAppStoreHydrated();
   const saveFormPageDraft = useAppStore((state) => state.saveFormPageDraft);
   const setFormApplicationId = useAppStore((state) => state.setFormApplicationId);
-  const [applicationId, setApplicationId] = useState<string | null>(initialApplicationId);
-  const [didRestorePersistedState, setDidRestorePersistedState] = useState(false);
   const [values, setValues] = useState<WizardPageValues>(() => getWizardDefaultValues(pageKey, initialValues));
   const [errors, setErrors] = useState<ErrorMap>({});
   const [softMissingIds, setSoftMissingIds] = useState<string[]>([]);
@@ -85,6 +65,15 @@ export function GenericWizardForm({
   const [modalOpen, setModalOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<WizardPageValues | null>(null);
   const deferredValues = useDeferredValue(values);
+  const { applicationId, setApplicationId } = useFormDraftPersistence({
+    deferredValues,
+    formId,
+    hasHydrated,
+    initialApplicationId,
+    mergePersistedDraft: (persistedDraft) => getWizardDefaultValues(pageKey, { ...initialValues, ...persistedDraft }),
+    onRestore: setValues,
+    pageKey
+  });
 
   const visibleFields = useMemo(
     () =>
@@ -93,39 +82,6 @@ export function GenericWizardForm({
       ),
     [page.sections, values]
   );
-
-  useEffect(() => {
-    if (!hasHydrated || didRestorePersistedState) {
-      return;
-    }
-
-    const persistedSession = useAppStore.getState().formSessions[formId];
-    const persistedDraft = persistedSession?.pages[pageKey];
-    const persistedApplicationId = persistedSession?.applicationId ?? null;
-
-    if (!initialApplicationId && persistedApplicationId) {
-      setApplicationId((current) => current ?? persistedApplicationId);
-    }
-
-    if (!persistedDraft) {
-      setDidRestorePersistedState(true);
-      return;
-    }
-
-    setValues((current) => ({
-      ...current,
-      ...persistedDraft
-    }));
-    setDidRestorePersistedState(true);
-  }, [didRestorePersistedState, formId, hasHydrated, initialApplicationId, pageKey]);
-
-  useEffect(() => {
-    if (!hasHydrated) {
-      return;
-    }
-
-    saveFormPageDraft(formId, pageKey, deferredValues);
-  }, [deferredValues, formId, hasHydrated, pageKey, saveFormPageDraft]);
 
   useEffect(() => {
     setErrors((current) => {
@@ -250,179 +206,16 @@ export function GenericWizardForm({
                 return null;
               }
 
-              const fieldError = errors[field.id];
-              const fieldMessageId = `${field.id}-message`;
-              const hasSoftMissing = softMissingIds.includes(field.id);
-              const shellClassName = ["field-shell", fieldError ? "has-error" : "", hasSoftMissing ? "soft-missing" : ""]
-                .filter(Boolean)
-                .join(" ");
-
-              if (field.type === "checkbox") {
-                return (
-                  <div className={shellClassName} id={`field-${field.id}`} key={field.id}>
-                    <label className="choice-option checkbox-option">
-                      <input
-                        aria-describedby={fieldError || hasSoftMissing ? fieldMessageId : undefined}
-                        checked={values[field.id] === true}
-                        onChange={(event) => {
-                          handleChange(field, event.target.checked);
-                        }}
-                        type="checkbox"
-                      />
-                      <span>
-                        {t(field.labelKey)}
-                        {getFieldBadge(field.requirement, t)}
-                      </span>
-                    </label>
-                    {field.helpKey ? <p className="field-help">{t(field.helpKey)}</p> : null}
-                    {renderFieldMessage(t, fieldError, hasSoftMissing, fieldMessageId)}
-                  </div>
-                );
-              }
-
-              if (field.type === "radio_group" || field.type === "checkbox_group") {
-                const currentValue = field.type === "checkbox_group" && Array.isArray(values[field.id]) ? values[field.id] : [];
-
-                return (
-                  <div className={shellClassName} id={`field-${field.id}`} key={field.id}>
-                    <fieldset aria-describedby={fieldError || hasSoftMissing ? fieldMessageId : undefined} className="choice-group">
-                      <legend>
-                        {t(field.labelKey)}
-                        {getFieldBadge(field.requirement, t)}
-                      </legend>
-                      {field.helpKey ? <p className="field-help">{t(field.helpKey)}</p> : null}
-                      {field.options?.map((option) => (
-                        <label className="choice-option" key={option.value}>
-                          <input
-                            checked={
-                              field.type === "radio_group"
-                                ? values[field.id] === option.value
-                                : Array.isArray(currentValue) && currentValue.includes(option.value)
-                            }
-                            onChange={(event) => {
-                              if (field.type === "radio_group") {
-                                handleChange(field, option.value);
-                                return;
-                              }
-
-                              const nextValues = event.target.checked
-                                ? [...(currentValue as string[]), option.value]
-                                : (currentValue as string[]).filter((item) => item !== option.value);
-                              handleChange(field, nextValues);
-                            }}
-                            type={field.type === "radio_group" ? "radio" : "checkbox"}
-                            value={option.value}
-                          />
-                          <span>{t(option.labelKey)}</span>
-                        </label>
-                      ))}
-                    </fieldset>
-                    {renderFieldMessage(t, fieldError, hasSoftMissing, fieldMessageId)}
-                  </div>
-                );
-              }
-
-              if (field.type === "file_list") {
-                const attachments = Array.isArray(values[field.id]) ? (values[field.id] as Array<{ name: string; size: number }>) : [];
-
-                return (
-                  <div className={shellClassName} id={`field-${field.id}`} key={field.id}>
-                    <label htmlFor={field.id}>
-                      {t(field.labelKey)}
-                      {getFieldBadge(field.requirement, t)}
-                    </label>
-                    {field.helpKey ? <p className="field-help">{t(field.helpKey)}</p> : null}
-                    <input
-                      className="field-control"
-                      id={field.id}
-                      multiple
-                      onChange={(event) => {
-                        const nextFiles = Array.from(event.target.files ?? []).map((file) => ({
-                          name: file.name,
-                          size: file.size,
-                          type: file.type
-                        }));
-                        handleChange(field, nextFiles);
-                      }}
-                      type="file"
-                    />
-                    {attachments.length > 0 ? (
-                      <ul className="upload-list">
-                        {attachments.map((attachment) => (
-                          <li key={attachment.name}>
-                            <span>{attachment.name}</span>
-                            <button
-                              className="inline-link"
-                              onClick={() => {
-                                handleChange(
-                                  field,
-                                  attachments.filter((item) => item.name !== attachment.name)
-                                );
-                              }}
-                              type="button"
-                            >
-                              {t("wizard.removeFile")}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    {renderFieldMessage(t, fieldError, hasSoftMissing, fieldMessageId)}
-                  </div>
-                );
-              }
-
               return (
-                <div className={shellClassName} id={`field-${field.id}`} key={field.id}>
-                  <label htmlFor={field.id}>
-                    {t(field.labelKey)}
-                    {getFieldBadge(field.requirement, t)}
-                  </label>
-                  {field.helpKey ? <p className="field-help">{t(field.helpKey)}</p> : null}
-
-                  {field.type === "select" ? (
-                    <select
-                      aria-describedby={fieldError || hasSoftMissing ? fieldMessageId : undefined}
-                      className="field-control"
-                      id={field.id}
-                      onChange={(event) => {
-                        handleChange(field, event.target.value);
-                      }}
-                      value={String(values[field.id] ?? "")}
-                    >
-                      <option value="">{t("wizard.selectPlaceholder")}</option>
-                      {field.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {t(option.labelKey)}
-                        </option>
-                      ))}
-                    </select>
-                  ) : field.type === "textarea" ? (
-                    <textarea
-                      aria-describedby={fieldError || hasSoftMissing ? fieldMessageId : undefined}
-                      className="field-control-textarea"
-                      id={field.id}
-                      onChange={(event) => {
-                        handleChange(field, event.target.value);
-                      }}
-                      rows={field.rows ?? 4}
-                      value={String(values[field.id] ?? "")}
-                    />
-                  ) : (
-                    <input
-                      aria-describedby={fieldError || hasSoftMissing ? fieldMessageId : undefined}
-                      className="field-control"
-                      id={field.id}
-                      onChange={(event) => {
-                        handleChange(field, event.target.value);
-                      }}
-                      type={field.type}
-                      value={String(values[field.id] ?? "")}
-                    />
-                  )}
-
-                  {renderFieldMessage(t, fieldError, hasSoftMissing, fieldMessageId)}
-                </div>
+                <WizardField
+                  config={field}
+                  error={errors[field.id]}
+                  hasSoftMissing={softMissingIds.includes(field.id)}
+                  key={field.id}
+                  onChange={(nextValue) => handleChange(field, nextValue)}
+                  softRequiredWarningKey="wizard.softRequired.leaveWarning"
+                  value={values[field.id]}
+                />
               );
             })}
           </div>
@@ -456,31 +249,4 @@ export function GenericWizardForm({
       />
     </PortalChrome>
   );
-}
-
-function renderFieldMessage(
-  t: ReturnType<typeof useTranslations>,
-  fieldError: ErrorMap[string] | undefined,
-  hasSoftMissing: boolean,
-  fieldMessageId: string
-) {
-  if (fieldError) {
-    return (
-      <p aria-live="polite" className="field-message" id={fieldMessageId}>
-        {fieldError.messageKey === "validation.requiredField" || fieldError.messageKey === "validation.requiredAttachment"
-          ? t(fieldError.messageKey, { field: fieldError.labelKey ? t(fieldError.labelKey) : "" })
-          : t(fieldError.messageKey)}
-      </p>
-    );
-  }
-
-  if (hasSoftMissing) {
-    return (
-      <p aria-live="polite" className="field-message warning" id={fieldMessageId}>
-        {t("wizard.softRequired.leaveWarning")}
-      </p>
-    );
-  }
-
-  return null;
 }
