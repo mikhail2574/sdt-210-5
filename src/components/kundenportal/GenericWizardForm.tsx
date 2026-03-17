@@ -59,7 +59,7 @@ export function GenericWizardForm({
   const setFormApplicationId = useAppStore((state) => state.setFormApplicationId);
   const [values, setValues] = useState<WizardPageValues>(() => getWizardDefaultValues(pageKey, initialValues));
   const [errors, setErrors] = useState<ErrorMap>({});
-  const [softMissingIds, setSoftMissingIds] = useState<string[]>([]);
+  const [softMissingIds, setSoftMissingIds] = useState<Set<string>>(new Set());
   const [statusKey, setStatusKey] = useState<"wizard.saved" | "wizard.saveError" | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -84,11 +84,13 @@ export function GenericWizardForm({
   );
 
   useEffect(() => {
+    const visibleFieldIdSet = new Set(visibleFields.map((field) => field.id));
+
     setErrors((current) => {
       const next: ErrorMap = {};
 
       for (const [fieldId, error] of Object.entries(current)) {
-        if (visibleFields.some((field) => field.id === fieldId)) {
+        if (visibleFieldIdSet.has(fieldId)) {
           next[fieldId] = error;
         }
       }
@@ -123,7 +125,7 @@ export function GenericWizardForm({
       setApplicationId(payload.applicationId);
       setFormApplicationId(formId, payload.applicationId);
       saveFormPageDraft(formId, pageKey, nextValues);
-      setSoftMissingIds(nextSoftMissing);
+      setSoftMissingIds(new Set(nextSoftMissing));
       setErrors({});
       setStatusKey("wizard.saved");
       router.push(`/${locale}/forms/${formId}/${payload.nextPageKey}?applicationId=${payload.applicationId}`);
@@ -168,7 +170,7 @@ export function GenericWizardForm({
 
     if (nextSoftMissing.length > 0) {
       setPendingValues(values);
-      setSoftMissingIds(nextSoftMissing.map((field) => field.id));
+      setSoftMissingIds(new Set(nextSoftMissing.map((field) => field.id)));
       setModalOpen(true);
       return;
     }
@@ -210,7 +212,7 @@ export function GenericWizardForm({
                 <WizardField
                   config={field}
                   error={errors[field.id]}
-                  hasSoftMissing={softMissingIds.includes(field.id)}
+                  hasSoftMissing={softMissingIds.has(field.id)}
                   key={field.id}
                   onChange={(nextValue) => handleChange(field, nextValue)}
                   softRequiredWarningKey="wizard.softRequired.leaveWarning"

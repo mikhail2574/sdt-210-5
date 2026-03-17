@@ -25,9 +25,11 @@ export default async function CustomerApplicationPage({ params }: CustomerApplic
     notFound();
   }
 
-  const messages = await getMessages(locale as Locale);
-  await requireServerCustomerApplicationId(locale as Locale, applicationId);
-  const application = await getPublicApplication(applicationId);
+  const [messages, , application] = await Promise.all([
+    getMessages(locale as Locale),
+    requireServerCustomerApplicationId(locale as Locale, applicationId),
+    getPublicApplication(applicationId)
+  ]);
 
   if (!application) {
     notFound();

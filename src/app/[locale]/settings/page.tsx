@@ -18,8 +18,10 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
     notFound();
   }
 
-  await getMessages(locale as Locale);
-  const user = await getServerStaffUser();
+  const [, user] = await Promise.all([
+    getMessages(locale as Locale),
+    getServerStaffUser()
+  ]);
   const ocrJobs = getOcrDemoJobs();
 
   const backendSnapshot = user

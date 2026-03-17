@@ -32,9 +32,11 @@ export default async function FinalPage({ params, searchParams }: FinalPageProps
     redirect(`/${locale}/forms/${formId}/antragsdetails`);
   }
 
-  const messages = await getMessages(locale as Locale);
-  const runtime = await getResolvedFormRuntime(formId);
-  const application = await getPublicApplication(applicationId);
+  const [messages, runtime, application] = await Promise.all([
+    getMessages(locale as Locale),
+    getResolvedFormRuntime(formId),
+    getPublicApplication(applicationId)
+  ]);
 
   if (!application || !application.trackingCode) {
     notFound();

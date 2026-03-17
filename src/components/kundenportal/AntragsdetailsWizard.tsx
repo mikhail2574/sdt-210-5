@@ -49,7 +49,7 @@ export function AntragsdetailsWizard({
   const [statusKey, setStatusKey] = useState<"wizard.saved" | "wizard.saveError" | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [softMissing, setSoftMissing] = useState<FieldBlock[]>([]);
-  const [softMissingIds, setSoftMissingIds] = useState<string[]>([]);
+  const [softMissingIds, setSoftMissingIds] = useState<Set<string>>(new Set());
   const [pendingValues, setPendingValues] = useState<AntragsdetailsFormValues | null>(null);
   const {
     control,
@@ -136,12 +136,12 @@ export function AntragsdetailsWizard({
     if (nextSoftMissing.length > 0) {
       setPendingValues(nextValues);
       setSoftMissing(nextSoftMissing);
-      setSoftMissingIds(nextSoftMissing.map((field) => field.id));
+      setSoftMissingIds(new Set(nextSoftMissing.map((field) => field.id)));
       setModalOpen(true);
       return;
     }
 
-    setSoftMissingIds([]);
+    setSoftMissingIds(new Set());
     void persist(nextValues);
   };
 
@@ -180,7 +180,7 @@ export function AntragsdetailsWizard({
                   block={block}
                   control={control}
                   error={errors[block.id as keyof AntragsdetailsFormValues]}
-                  hasSoftMissing={softMissingIds.includes(block.id)}
+                  hasSoftMissing={softMissingIds.has(block.id)}
                   key={block.id}
                   softRequiredWarningKey={page.softRequiredLeaveWarningI18nKey}
                 />

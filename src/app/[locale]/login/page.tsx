@@ -21,8 +21,10 @@ export default async function CustomerLoginPage({ params }: CustomerLoginPagePro
     notFound();
   }
 
-  const messages = await getMessages(locale as Locale);
-  const runtime = await getResolvedFormRuntime("hausanschluss-demo");
+  const [messages, runtime] = await Promise.all([
+    getMessages(locale as Locale),
+    getResolvedFormRuntime("hausanschluss-demo")
+  ]);
 
   return (
     <PortalChrome locale={locale as Locale} theme={runtime.theme}>
